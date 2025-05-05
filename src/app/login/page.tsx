@@ -1,8 +1,9 @@
+import Link from 'next/link';
 import { Button } from '../../components/ui/button';
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+        <div className="flex-1 flex flex-col justify-center items-center h-full bg-red-50">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Login</h2>
             <form>
@@ -44,9 +45,9 @@ export default function LoginPage() {
             <div className="mt-4 text-center">
                 <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a href="/register" className="text-blue-500 hover:text-blue-700">
+                <Link href="/register" className="text-blue-500 hover:text-blue-700">
                     Sign up
-                </a>
+                </Link>
                 </p>
             </div>
             </div>

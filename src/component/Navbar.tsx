@@ -9,8 +9,10 @@ function Navbar() {
         <>
             <nav className="flex justify-between items-center px-6 py-4 border-b shadow-sm">
                 <div className="flex items-center gap-2">
-                <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-                <span className="text-xl font-bold">WebSocketApp</span>
+                    <Link href="/" className="flex items-center">
+                        <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+                        <span className="text-xl font-bold">WebSocketApp</span>
+                    </Link>
                 </div>
                 <div className="flex gap-4 items-center">
                 <Link href="/">
