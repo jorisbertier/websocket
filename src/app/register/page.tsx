@@ -1,13 +1,32 @@
-import { Button } from '@/components/ui/button'; // Adapte ce chemin si nécessaire
+'use client'
+
+import { Button } from '@/components/ui/button';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
 export default function RegisterPage() {
+
+    const [form, setForm] = useState({
+        name: '',
+        email: '',
+        password: ''
+    })
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setForm({...form, [e.target.name]: e.target.value})
+        e.preventDefault()
+    }
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault()
+        console.log('Form de co', form)
+    } 
 
     return (
         <div className="flex-1 flex items-center justify-center bg-red-50 px-4 h-full">
         <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Create an account</h2>
 
-            <form>
+            <form onSubmit={handleSubmit}>
             {/* Name */}
             <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -18,6 +37,7 @@ export default function RegisterPage() {
                 name="name"
                 id="name"
                 required
+                onChange={handleChange}
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="John Doe"
                 />
@@ -33,6 +53,7 @@ export default function RegisterPage() {
                 name="email"
                 id="email"
                 required
+                onChange={handleChange}
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="you@example.com"
                 />
@@ -48,6 +69,7 @@ export default function RegisterPage() {
                 name="password"
                 id="password"
                 required
+                onChange={handleChange}
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••"
                 />
