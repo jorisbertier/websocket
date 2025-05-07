@@ -16,9 +16,25 @@ export default function RegisterPage() {
         e.preventDefault()
     }
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         console.log('Form de co', form)
+        try {
+            const res = await fetch('http://localhost:3000/api/users/register', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(form)
+            })
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            console.log('User registered successfully:', data);
+
+        } catch(e) {
+            console.log('Error registration: ', e)
+        }
     } 
 
     return (

@@ -1,14 +1,15 @@
-import { User }  from '../models/user';
-import { express } from 'express'
-import { bcrypt } from 'bcrypt';
-import connectToDatabase from '../services/database';
-const router = new express.Router()
+import { User }  from '../models/user.js';
+import express from 'express';
+import bcrypt from 'bcrypt';
+import connectToDatabase from '../services/database.js';
+
+const router = express.Router()
 
 
 router.post('/register', async (req, res) => {
     const { name, email, password} = req.body;
 
-    const db = await connectToDatabase().catch(err => console.log(err))
+    const db = await connectToDatabase()
     const users = db.collection('users')
 
     try {

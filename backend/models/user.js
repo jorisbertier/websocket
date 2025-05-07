@@ -1,5 +1,6 @@
-import { mongoose } from 'mongoose';
-import {validator} from 'validator';
+import mongoose from 'mongoose';
+import validator from 'validator';
+
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         validate(v) {
-            if(!validator.isEmail(v))  throw new error('Email is not a valid email address')
+            if(!validator.isEmail(v))  throw new Error('Email is not a valid email address')
         }
     },
     password: {
@@ -20,7 +21,11 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     createdAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     }
 })
-module.exports = mongoose.model('User',userSchema)
+
+
+const User = mongoose.model('User', userSchema);
+export { User };
