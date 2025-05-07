@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
             console.log('User registered successfully:', data);
             // if(client) {
-                router.push('/login')
+                router.push('/login?creation=true')
             // }
         } catch(e) {
             console.log('Error registration: ', e)

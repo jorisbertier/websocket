@@ -2,12 +2,22 @@
 
 import Link from 'next/link';
 import { Button } from '../../components/ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
 
     const [ email, setName] = useState('')
     const [ password, setPassword] = useState('')
+    const searchParams = useSearchParams()
+    const [showMessage, setShowMessage] = useState(false)
+
+    useEffect(() => {
+        if(searchParams.get('creation') === 'true') {
+            setShowMessage(true)
+            setTimeout(() => setShowMessage(false), 4000)
+        }
+    }, [searchParams])
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement> ) => {
         e.preventDefault()
@@ -16,7 +26,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex-1 flex flex-col justify-center items-center h-full bg-red-50">
+        <div className="flex-1 flex flex-col relative justify-center items-center h-full bg-red-50">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Login</h2>
             <form onSubmit={handleLogin}>
@@ -67,12 +77,13 @@ export default function LoginPage() {
                 </p>
             </div>
             </div>
-            <div className="p-4">
-        <div className="mb-4 p-3 bg-green-100 text-green-500 rounded">
-            Registration successfully !
-        </div>
-      {/* Ton formulaire de login ici */}
-    </div>
+            {showMessage && (
+            <div className="p-4 absolute bottom-4">
+                <div className="mb-4 p-3 bg-green-100 text-green-500 rounded">
+                    Registration successfully !
+                </div>
+            </div>
+            )}
         </div>
     );
 }
