@@ -67,6 +67,12 @@ export default function LoginPage() {
                 </p>
             </div>
             </div>
+            <div className="p-4">
+        <div className="mb-4 p-3 bg-green-100 text-green-500 rounded">
+            Registration successfully !
+        </div>
+      {/* Ton formulaire de login ici */}
+    </div>
         </div>
     );
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
 
@@ -10,6 +11,12 @@ export default function RegisterPage() {
         email: '',
         password: ''
     })
+    const [ client, setClient] = useState(false)
+    const router = useRouter()
+
+    useEffect(() => {
+        setClient(true)
+    }, [])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setForm({...form, [e.target.name]: e.target.value})
@@ -20,7 +27,7 @@ export default function RegisterPage() {
         e.preventDefault()
         console.log('Form de co', form)
         try {
-            const res = await fetch('http://localhost:3000/api/users/register', {
+            const res = await fetch('http://localhost:3001/api/users/register', {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json'
@@ -31,7 +38,9 @@ export default function RegisterPage() {
             if (!res.ok) throw new Error(data.message);
 
             console.log('User registered successfully:', data);
-
+            // if(client) {
+                router.push('/login')
+            // }
         } catch(e) {
             console.log('Error registration: ', e)
         }

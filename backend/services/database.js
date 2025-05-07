@@ -9,7 +9,7 @@ async function connectToDatabase() {
     try {
         await client.connect();
         console.log("✅ Connected to MongoDB");
-        const db = client.db('<dbname>');
+        const db = client.db('websocket');
         return db;
     } catch (error) {
         console.error("❌ MongoDB connection error:", error);
