@@ -23,7 +23,6 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        // console.log('Form de co', form)
         try {
             const res = await fetch('http://localhost:3001/api/register', {
                 method: 'post',
