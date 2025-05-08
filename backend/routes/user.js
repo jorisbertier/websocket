@@ -27,13 +27,13 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ errors });
         }
     
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // const hashedPassword = await bcrypt.hash(password, 10);
         const createdAt = new Date()
 
         const user = new User({
             name,
             email,
-            password: hashedPassword,
+            password,
             createdAt
         })
         if(user.email)

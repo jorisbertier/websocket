@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcrypt';
 
 
 const userSchema = new mongoose.Schema({
@@ -26,6 +27,13 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+})
+
+userSchema.pre('save', async function(next) {
+    if(this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
 })
 
 userSchema.methods.toJSON = function() {
