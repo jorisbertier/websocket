@@ -2,16 +2,12 @@ import { User }  from '../models/user.js';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-// import connectToDatabase from '../services/database.js';
-
 const router = express.Router()
 
 
 router.post('/register', async (req, res) => {
     const { name, email, password} = req.body;
 
-    // const db = await connectToDatabase()
-    // const users = db.collection('users')
     const errors = {};
 
     try {
@@ -63,6 +59,30 @@ router.post('/register', async (req, res) => {
             });
         }
         res.status(500).json({ message: 'Server Error'})
+    }
+})
+
+router.post('/login', async(req, res) => {
+    const { email, password} = req.body
+    console.log('body request', req.body)
+    try {
+        const user = await User.findOne({email})
+
+        if(!user) {
+            res.status(400).json({ message: 'Invalid email'})
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+        if(!isPasswordValid) {
+            res.status(400).json({ message: 'Invalid password'})
+        }
+
+        res.status(200).send({ user})
+        console.log('connecté')
+    } catch(e) {
+        console.log('Error connexion', e.message)
+        res.status(400).send({ message: e.message})
     }
 })
 

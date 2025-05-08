@@ -25,7 +25,7 @@ export default function RegisterPage() {
         e.preventDefault()
         // console.log('Form de co', form)
         try {
-            const res = await fetch('http://localhost:3001/api/users/register', {
+            const res = await fetch('http://localhost:3001/api/register', {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json'

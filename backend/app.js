@@ -21,7 +21,7 @@ app.use(express.json());
 
 await connectToDatabase();
 
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
 
 app.listen(PORT, ()=> {
     console.log(`Server launched localhost/${PORT}`)
