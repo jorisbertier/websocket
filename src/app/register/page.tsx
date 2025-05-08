@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
@@ -11,12 +11,10 @@ export default function RegisterPage() {
         email: '',
         password: ''
     })
-    const [ client, setClient] = useState(false)
+    const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
+
     const router = useRouter()
 
-    useEffect(() => {
-        setClient(true)
-    }, [])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setForm({...form, [e.target.name]: e.target.value})
@@ -25,7 +23,7 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        console.log('Form de co', form)
+        // console.log('Form de co', form)
         try {
             const res = await fetch('http://localhost:3001/api/users/register', {
                 method: 'post',
@@ -35,12 +33,16 @@ export default function RegisterPage() {
                 body: JSON.stringify(form)
             })
             const data = await res.json();
-            if (!res.ok) throw new Error(data.message);
+            if (!res.ok) {
+                console.log(data)
+                setErrors(data.errors);
+                return;
+            }
+            setErrors({})
 
             console.log('User registered successfully:', data);
-            // if(client) {
-                router.push('/login?creation=true')
-            // }
+            router.push('/login?creation=true');
+
         } catch(e) {
             console.log('Error registration: ', e)
         }
@@ -66,6 +68,7 @@ export default function RegisterPage() {
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="John Doe"
                 />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
             {/* Email */}
@@ -74,7 +77,7 @@ export default function RegisterPage() {
                 Email address
                 </label>
                 <input
-                type="email"
+                type="text"
                 name="email"
                 id="email"
                 required
@@ -82,6 +85,9 @@ export default function RegisterPage() {
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="you@example.com"
                 />
+            {errors.email &&(
+                <span className='text-red-500 -mt-10 text-sm'>{errors.email}</span>
+            )}
             </div>
 
             {/* Password */}
@@ -98,6 +104,7 @@ export default function RegisterPage() {
                 className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••"
                 />
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
             {/* Submit */}

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        minlength: 2
     },
     email: {
         type: String,
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+        minlength: 6
     },
     createdAt: {
         type: Date,
@@ -27,5 +29,5 @@ const userSchema = new mongoose.Schema({
 })
 
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema, 'users');
 export { User };
