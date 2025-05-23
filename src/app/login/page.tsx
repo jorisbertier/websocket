@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '../../components/ui/button';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
 
@@ -11,7 +11,8 @@ export default function LoginPage() {
     const [ password, setPassword] = useState('')
     const searchParams = useSearchParams()
     const [showMessage, setShowMessage] = useState(false)
-    const [ error, setError] = useState('')
+    const [ error, setError] = useState('');
+    const router = useRouter();
 
     useEffect(() => {
         if(searchParams.get('creation') === 'true') {
@@ -41,6 +42,8 @@ export default function LoginPage() {
             }
             setError('')
             console.log('Login done !', data);
+            const idUser = data.user._id;
+            router.push(`/dashboard/${idUser}`);
         } catch(e) {
             console.log('Error durantly connexion', e)
         }
