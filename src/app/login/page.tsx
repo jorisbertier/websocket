@@ -11,6 +11,7 @@ export default function LoginPage() {
     const [ password, setPassword] = useState('')
     const searchParams = useSearchParams()
     const [showMessage, setShowMessage] = useState(false)
+    const [ error, setError] = useState('')
 
     useEffect(() => {
         if(searchParams.get('creation') === 'true') {
@@ -19,10 +20,30 @@ export default function LoginPage() {
         }
     }, [searchParams])
 
-    const handleLogin = (e: React.FormEvent<HTMLFormElement> ) => {
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement> ) => {
         e.preventDefault()
         console.log(email)
         console.log(password)
+        try {
+            const res = await fetch('http://localhost:3001/api/login', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password})
+            })
+            const data = await res.json();
+            console.log('daata', data.message)
+            if (!res.ok) {
+                console.error('Erreur de login:', data.message || data.errors);
+                setError(data.message)
+                return;
+            }
+            setError('')
+            console.log('Login done !', data);
+        } catch(e) {
+            console.log('Error durantly connexion', e)
+        }
     }
 
     return (
@@ -61,6 +82,9 @@ export default function LoginPage() {
                     className="w-full mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your password"
                 />
+                {error && (
+                    <span className='text-red-400 text-sm'>{error}</span>
+                )}
                 </div>
     
                 <Button size="lg" type="submit" className="w-full bg-black text-white hover:bg-blue-600">

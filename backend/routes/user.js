@@ -13,7 +13,7 @@ router.post('/register', async (req, res) => {
     try {
         
 
-        console.log('Connected:', mongoose.connection.readyState); // 1 = connecté
+        console.log('Connected:', mongoose.connection.readyState); // 1 = connected
         console.log('Model collection name:', User.collection.name);
         const existingUser = await User.findOne({ email });
         if (existingUser) errors.email = 'Email already in use';
@@ -27,7 +27,6 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ errors });
         }
     
-        // const hashedPassword = await bcrypt.hash(password, 10);
         const createdAt = new Date()
 
         const user = new User({
@@ -47,11 +46,11 @@ router.post('/register', async (req, res) => {
         if (e.name === 'ValidationError') {
             const errors = {};
             for (const field in e.errors) {
-              errors[field] = e.errors[field].message;
+                errors[field] = e.errors[field].message;
             }
             return res.status(400).json({ errors });
-          }
-          if (e.code === 11000 && e.keyPattern && e.keyPattern.email) {
+        }
+        if (e.code === 11000 && e.keyPattern && e.keyPattern.email) {
             return res.status(400).json({
                 errors: {
                     email: 'Email already in use'
