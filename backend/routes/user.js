@@ -2,6 +2,7 @@ import { User }  from '../models/user.js';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken'
 const router = express.Router()
 
 
@@ -77,11 +78,33 @@ router.post('/login', async(req, res) => {
             res.status(400).json({ message: 'Invalid password'})
         }
 
-        res.status(200).send({ user})
+        const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        })
+
+        res.status(200).send({ user, token})
         console.log('connecté')
     } catch(e) {
         console.log('Error connexion', e.message)
         res.status(400).send({ message: e.message})
+    }
+})
+
+router.get('/me', async (req, res) => {
+    
+    const authHeader = req.headers.authorization;
+    if(!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ message: 'Unauthorized'})
+    }
+    const token = authHeader.split(' ')[1]
+    
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const user = await User.findById(decoded.id).select('-password')
+        res.status(200).json(user)
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid token' })
+        console.log(error)
     }
 })
 
