@@ -83,10 +83,10 @@ router.post('/login', async(req, res) => {
         })
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // true en prod (https)
-            sameSite: 'lax', // ou 'strict' selon tes besoins
+            secure: false, // true en prod (https)
+            sameSite: 'lax', // ou 'strict'
             maxAge: 3600000, // 1h en ms
-          });
+        });
         res.status(200).send({ user, token})
         console.log('connecté')
     } catch(e) {
@@ -97,11 +97,10 @@ router.post('/login', async(req, res) => {
 
 router.get('/me', async (req, res) => {
     
-    const authHeader = req.headers.authorization;
-    if(!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({ message: 'Unauthorized'})
+    const token = req.cookies.token;
+    if(!token) {
+        return res.status(401).json({ message: 'Unauthorized'})
     }
-    const token = authHeader.split(' ')[1]
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)

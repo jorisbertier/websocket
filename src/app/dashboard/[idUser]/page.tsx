@@ -1,29 +1,17 @@
 "use client"
 
-import { useEffect } from "react";
+import { useUser } from "@/hooks/useUser"
 
-interface DashboardProps {
-    params: {
-        idUser: string;
-    };
-}
 
-function Dashboard({params} : DashboardProps) {
+function Dashboard() {
+    
+    const { user, loading, error} = useUser();
+    if(loading) return <p>Loading ...</p>
+    if (error) return <p>Erreur: {error}</p>;
 
-    useEffect(() => {
-        try {
-            const response = await fetch('http://localhost:3001/api/me',
-                meyhod: 'GET',
-                headers: {
-                    "Content-type": application/json
-                },
-            )
-        }
-    })
-
-    console.log('voici id user:', params.idUser)
+    console.log('voici connected user:',user)
     return (
-        <div>Bienvenue sur votre dashboard Paul</div>
+        <div>Bienvenue sur votre dashboard {user?.name}</div>
     )
 }
 

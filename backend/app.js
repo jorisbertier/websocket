@@ -9,18 +9,18 @@ const PORT = 3001;
 
 const corsOptions = {
     origin: 'http://localhost:3000',
+    secure: false,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 };
 
+app.use(cookieParser());
 app.use(cors(corsOptions)); 
 app.get('/', (req, res) => {
     res.send('hello world')
 });
 
 app.use(express.json());
-app.use(cookieParser());
 
 await connectToDatabase();
 
