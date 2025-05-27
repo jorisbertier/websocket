@@ -5,23 +5,26 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react';
 import Spinner from '@/component/Spinner';
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
+export default function GuestGuard({ children }: { children: React.ReactNode }) {
     const { user, loading } = useUser()
     const router = useRouter()
 
     console.log('AuthGuard state:', { user, loading })
 
     useEffect(() => {
-        if (!loading && !user) {
-            console.log('effectue le guard')
-            router.push('/login')
+        if (!loading && user) {
+            router.push('/dashboard')
         }
     }, [loading, user, router])
 
-    if (loading || !user) {
+    if (loading) {
         return <Spinner />
     }
 
+    if (!user) {
+        return null
+    }
+    
     return <>{children}</>
 }
 

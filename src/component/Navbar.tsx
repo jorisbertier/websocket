@@ -1,12 +1,15 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from '../components/ui/button'
+import { useUser } from "@/hooks/useUser";
 
 
 function Navbar() {
 
-
+    const { user, loading} = useUser();
     
     return (
         <>
@@ -24,9 +27,15 @@ function Navbar() {
                 <Link href="/about">
                     <span className="hover:underline text-sm sm:text-base">À propos</span>
                 </Link>
-                <Button asChild>
-                    <Link href="/login">Connexion</Link>
-                </Button>
+                {!loading && (
+          <Button asChild>
+            {user ? (
+              <Link href="/logout">Logout</Link>
+            ) : (
+              <Link href="/login">Connexion</Link>
+            )}
+          </Button>
+        )}
                 </div>
             </nav>
         </>
