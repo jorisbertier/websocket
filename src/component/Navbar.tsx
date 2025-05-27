@@ -5,6 +5,9 @@ import { Button } from '../components/ui/button'
 
 
 function Navbar() {
+
+
+    
     return (
         <>
             <nav className="flex justify-between items-center px-6 py-4 border-b shadow-sm">

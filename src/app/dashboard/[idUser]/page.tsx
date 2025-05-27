@@ -1,17 +1,21 @@
 "use client"
 
+import AuthGuard from "@/auth/authGuard";
 import { useUser } from "@/hooks/useUser"
 
 
 function Dashboard() {
     
-    const { user, loading, error} = useUser();
-    if(loading) return <p>Loading ...</p>
-    if (error) return <p>Erreur: {error}</p>;
+    const { user} = useUser();
+    
+    console.log(user)
 
     console.log('voici connected user:',user)
     return (
-        <div>Bienvenue sur votre dashboard {user?.name}</div>
+        <AuthGuard>
+            <div>Bienvenue sur votre dashboard {user?.name}</div>
+
+        </AuthGuard>
     )
 }
 
