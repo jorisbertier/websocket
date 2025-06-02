@@ -1,6 +1,7 @@
 "use client"
 
 import AuthGuard from "@/auth/authGuard";
+import Chat from "@/component/chat";
 import { useUser } from "@/hooks/useUser"
 
 
@@ -14,7 +15,7 @@ function Dashboard() {
     return (
         <AuthGuard>
             <div>Bienvenue sur votre dashboard {user?.name}</div>
-
+            <Chat username={user?.email.toString()} />
         </AuthGuard>
     )
 }
