@@ -7,7 +7,7 @@ export default function MessagesPage() {
     { id: 1, from: 'Alice', text: 'Salut, ça va ?' },
     { id: 2, from: 'Bob', text: 'On se voit ce week-end ?' },
   ]);
-//add style
+
   const [friends, setFriends] = useState(['Alice', 'Bob']);
   const [newFriend, setNewFriend] = useState('');
 
