@@ -21,20 +21,29 @@ function Navbar() {
                     </Link>
                 </div>
                 <div className="flex gap-4 items-center">
-                <Link href="/">
-                    <span className="hover:underline text-sm sm:text-base">Accueil</span>
-                </Link>
-                <Link href="/about">
-                    <span className="hover:underline text-sm sm:text-base">À propos</span>
-                </Link>
+                {!user ? (
+                    <>
+                        <Link href="/">
+                            <span className="hover:underline text-sm sm:text-base">Accueil</span>
+                        </Link>
+                        <Link href="/about">
+                            <span className="hover:underline text-sm sm:text-base">À propos</span>
+                        </Link>
+                    </>
+                ) : (
+                    <>
+                    <Link href="/message">message</Link>
+                    </>
+                )
+            }
                 {!loading && (
-          <Button asChild>
-            {user ? (
-              <Link href="/logout">Logout</Link>
-            ) : (
-              <Link href="/login">Connexion</Link>
-            )}
-          </Button>
+                <Button asChild>
+                    {user ? (
+                    <Link href="/logout">Logout</Link>
+                    ) : (
+                    <Link href="/login">Connexion</Link>
+                    )}
+                </Button>
         )}
                 </div>
             </nav>
