@@ -18,6 +18,13 @@ const userSchema = new mongoose.Schema({
             if(!validator.isEmail(v))  throw new Error('Email is not a valid email address')
         }
     },
+    pseudo: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        minLength: 4
+    },
     password: {
         type: String,
         required: true,
@@ -26,6 +33,9 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    friends: {
+        type: Array
     }
 })
 

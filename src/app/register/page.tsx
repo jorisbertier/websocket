@@ -3,16 +3,16 @@
 import { Button } from '@/components/ui/button';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import GuestGuard from '@/auth/guestGuard';
 
 export default function RegisterPage() {
 
     const [form, setForm] = useState({
         name: '',
         email: '',
+        pseudo: '',
         password: ''
     })
-    const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
+    const [errors, setErrors] = useState<{ name?: string; email?: string; pseudo?: string; password?: string }>({});
 
     const router = useRouter()
 
@@ -87,6 +87,25 @@ export default function RegisterPage() {
                         />
                     {errors.email &&(
                         <span className='text-red-500 -mt-10 text-sm'>{errors.email}</span>
+                    )}
+                    </div>
+
+                    {/* Pseudo */}
+                    <div className="mb-4">
+                        <label htmlFor="pseudo" className="block text-sm font-medium text-gray-700">
+                        Pseudo
+                        </label>
+                        <input
+                        type="text"
+                        name="pseudo"
+                        id="pseudo"
+                        required
+                        onChange={handleChange}
+                        className="mt-2 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="nametag"
+                        />
+                    {errors.pseudo &&(
+                        <span className='text-red-500 -mt-10 text-sm'>{errors.pseudo}</span>
                     )}
                     </div>
 

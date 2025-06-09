@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 router.post('/register', async (req, res) => {
-    const { name, email, password} = req.body;
+    const { name, email, pseudo, password} = req.body;
 
     const errors = {};
 
@@ -17,9 +17,16 @@ router.post('/register', async (req, res) => {
         console.log('Connected:', mongoose.connection.readyState); // 1 = connected
         console.log('Model collection name:', User.collection.name);
         const existingUser = await User.findOne({ email });
+        const existingPseudo = await User.findOne({ pseudo });
         if (existingUser) errors.email = 'Email already in use';
+        if (existingPseudo) errors.pseudo = 'Pseudo already in use';
 
         if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors });
+        }
+        
+        if (pseudo.length < 4) {
+            errors.pseudo = 'Pseudo must be at least 4 characters';
             return res.status(400).json({ errors });
         }
 
@@ -33,6 +40,7 @@ router.post('/register', async (req, res) => {
         const user = new User({
             name,
             email,
+            pseudo,
             password,
             createdAt
         })
