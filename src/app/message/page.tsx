@@ -1,7 +1,7 @@
 "use client"
 
 import { useUsersList } from '@/hooks/useUsersList';
-import Image from 'next/image';
+// import Image from 'next/image';
 import { useState } from 'react';
 
 interface User {
@@ -32,10 +32,30 @@ export default function MessagesPage() {
     const fiteredUsersList = usersList.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
     setFilteredUsersList(fiteredUsersList)
   };
-  const handleAddFriend = () => {
-    if (newFriend && !friends.includes(newFriend)) {
-      setFriends([...friends, newFriend]);
-      setNewFriend('');
+  const handleAddFriend = async (pseudo: string) => {
+    console.log('click')
+    console.log('add: ',pseudo)
+    try {
+      const response = await fetch('http://localhost/api/friendRequest', {
+        method: 'POST',
+        headers: {
+          'Content-type' : 'application/json',
+        },
+        body : JSON.stringify({
+          fromUserId: 'idarecuperer',
+          toUserIdPseudo: pseudo,
+        }),
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if(response.ok) {
+        console.log('Request sent')
+      } else {
+        console.log('Error while sending friend request', data.message)
+      }
+
+    }catch(e) {
+      console.log('Error while sending friend request: ', e)
     }
   };
 
@@ -76,12 +96,12 @@ export default function MessagesPage() {
                   <li
                     key={id}
                     className="px-4 py-2 hover:bg-blue-100 w-full cursor-pointer transition-all"
-                    onClick={() => setNewFriend(friend.pseudo)}
+                    // onClick={() => setNewFriend(friend.pseudo)}
                   >
                     <div className='w-full flex justify-between items-center py-2'>
                       {/* <Image/> */}
                       <span className='text-lg'>{friend.pseudo}</span>
-                      <span className='bg-blue-300 rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</span>
+                      <span onClick={() => handleAddFriend(friend.pseudo)} className='bg-blue-300 rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</span>
                     </div>
                     
                   </li>
@@ -92,12 +112,12 @@ export default function MessagesPage() {
             </ul>
           )}
 
-          {/* <button
+          <button
             onClick={handleAddFriend}
             className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-all"
           >
             Ajouter l'ami
-          </button> */}
+          </button>
         </div>
         </div>
 
