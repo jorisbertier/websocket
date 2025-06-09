@@ -1,6 +1,7 @@
 "use client"
 
 import { useUsersList } from '@/hooks/useUsersList';
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface User {
@@ -55,31 +56,50 @@ export default function MessagesPage() {
       </div> */}
 
       {/* Ajouter un ami */}
-      <div className="bg-white p-4 rounded shadow mb-6">
-        <h2 className="text-xl font-semibold mb-4">Ajouter un ami</h2>
-        <div className="flex items-center space-x-2">
+  {/* Section Ajout d'ami */}
+  <div className="bg-white p-6 rounded-xl shadow-md max-w-md mx-auto mb-10">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Rechercher un ami</h2>
+        
+        <div className="flex flex-col gap-4">
           <input
             type="text"
-            placeholder="Nom de l'ami"
+            placeholder="Entrez un pseudo..."
             value={newFriend}
             onChange={handleSearchFriend}
-            className="border p-2 rounded w-full"
+            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <button
-            onClick={handleAddFriend}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-            add friend
-          </button>
-        </div>
-      </div>
-      {/* {newFriend && ( */}
-            <ul>
-              {filteredUsersList.map((friend, id) => (
-                <li key={id}>{friend?.pseudo}</li>
-              ))}
+
+          {newFriend && (
+            <ul className="bg-gray-50 border border-gray-200 rounded-lg shadow-inner max-h-40 overflow-y-auto">
+              {filteredUsersList.length > 0 ? (
+                filteredUsersList.map((friend, id) => (
+                  <li
+                    key={id}
+                    className="px-4 py-2 hover:bg-blue-100 w-full cursor-pointer transition-all"
+                    onClick={() => setNewFriend(friend.pseudo)}
+                  >
+                    <div className='w-full flex justify-between items-center py-2'>
+                      {/* <Image/> */}
+                      <span className='text-lg'>{friend.pseudo}</span>
+                      <span className='bg-blue-300 rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</span>
+                    </div>
+                    
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-gray-500 italic">Aucun utilisateur trouvé</li>
+              )}
             </ul>
-      {/* )} */}
+          )}
+
+          {/* <button
+            onClick={handleAddFriend}
+            className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-all"
+          >
+            Ajouter l'ami
+          </button> */}
+        </div>
+        </div>
 
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
