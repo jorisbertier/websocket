@@ -15,6 +15,7 @@ function Dashboard() {
     return (
         <AuthGuard>
             <div>Bienvenue sur votre dashboard {user?.name}</div>
+            <div>Votre gamer tag est: {user?.pseudo}</div>
         </AuthGuard>
     )
 }
