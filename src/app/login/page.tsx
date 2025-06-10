@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '../../components/ui/button';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import GuestGuard from '@/auth/guestGuard';
+import { useUser } from '@/context/UserContext';
 
 export default function LoginPage() {
 
@@ -15,6 +15,8 @@ export default function LoginPage() {
     const [ error, setError] = useState('');
     const router = useRouter();
 
+    const { setUser, refreshUser } = useUser();
+
     useEffect(() => {
         if(searchParams.get('creation') === 'true') {
             setShowMessage(true)
@@ -23,9 +25,7 @@ export default function LoginPage() {
     }, [searchParams])
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement> ) => {
-        e.preventDefault()
-        console.log(email)
-        console.log(password)
+        e.preventDefault();
         try {
             const res = await fetch('http://localhost:3001/api/login', {
                 method: 'post',
@@ -36,15 +36,17 @@ export default function LoginPage() {
                 body: JSON.stringify({ email, password})
             })
             const data = await res.json();
-            console.log('daata', data.message)
+            // console.log('daata', data.message)
             if (!res.ok) {
                 console.error('Erreur de login:', data.message || data.errors);
                 setError(data.message)
                 return;
             }
             setError('')
+            setUser(data.user)
             console.log('Login done !', data);
             // const idUser = data.user._id;
+            refreshUser(); 
             router.push(`/dashboard`);
         } catch(e) {
             console.log('Error durantly connexion', e)

@@ -4,14 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from '../components/ui/button'
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 
 
 function Navbar() {
 
-    const { user, loading} = useUser();
+    const { user, loading, setUser} = useUser();
     const router = useRouter();
+    console.log("Navbar user: ", user);
 
     const handleLogout = async () => {
         try {
@@ -22,6 +23,7 @@ function Navbar() {
 
             if(response.ok) {
                 console.log('Logout sucessfull')
+                setUser(null)
                 router.push('/')
             } else {
                 console.log('Error durantly logout')
@@ -56,7 +58,7 @@ function Navbar() {
                     </>
                 )
             }
-                {!loading && (
+                {/* {!loading && ( */}
                 <Button asChild>
                     {user ? (
                     <button className="cursor-pointer" onClick={handleLogout}>Logout</button>
@@ -64,7 +66,7 @@ function Navbar() {
                     <Link className="cursor-pointer" href="/login">Connexion</Link>
                     )}
                 </Button>
-        )}
+        {/* )} */}
                 </div>
             </nav>
         </>

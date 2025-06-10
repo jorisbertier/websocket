@@ -9,11 +9,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { user, loading } = useUser()
     const router = useRouter()
 
-    console.log('AuthGuard state:', { user, loading })
+    // console.log('AuthGuard state:', { user, loading })
 
     useEffect(() => {
         if (!loading && !user) {
-            console.log('effectue le guard')
+            // console.log('effectue le guard')
             router.push('/login')
         }
     }, [loading, user, router])
