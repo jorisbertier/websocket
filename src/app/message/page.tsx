@@ -1,5 +1,6 @@
 "use client"
 
+import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 // import Image from 'next/image';
 import { useState } from 'react';
@@ -11,6 +12,9 @@ interface User {
 export default function MessagesPage() {
 
   const { usersList } = useUsersList();
+  const { user} = useUser();
+  console.log(user?._id)
+
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
   console.log(filteredUsersList)
 
@@ -33,16 +37,15 @@ export default function MessagesPage() {
     setFilteredUsersList(fiteredUsersList)
   };
   const handleAddFriend = async (pseudo: string) => {
-    console.log('click')
-    console.log('add: ',pseudo)
+
     try {
-      const response = await fetch('http://localhost/api/friendRequest', {
+      const response = await fetch('http://localhost:3001/api/friendRequest', {
         method: 'POST',
         headers: {
           'Content-type' : 'application/json',
         },
         body : JSON.stringify({
-          fromUserId: 'idarecuperer',
+          fromUserId: user?._id,
           toUserIdPseudo: pseudo,
         }),
         credentials: 'include'

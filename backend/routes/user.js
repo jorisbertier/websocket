@@ -137,4 +137,30 @@ router.get('/usersList', async (req, res) => {
     }
 })
 
+router.post('/friendRequest', async (req, res) => {
+    const { fromUserId, toUserIdPseudo} = req.body
+
+    if(!fromUserId || !toUserIdPseudo) {
+        return res.status(400).json({ message : 'Missing Data'})
+    }
+    try {
+        const user = await User.findOne({ pseudo : toUserIdPseudo});
+        if(!user) return res.status(400).json({ message: 'User not found'})
+
+        if(!user.friendRequests) user.friendRequests = []
+
+        if(user.friendRequests.includes(fromUserId)) {
+            return res.status(400).json({message : 'Request already sent'})
+        }
+        user.friendRequests.push(fromUserId); 
+        await user.save()
+
+        console.log('Request sent')
+        res.status(200).json({ message: 'Request sent'})
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid token' })
+        console.log(error)
+    }
+})
+
 export default router

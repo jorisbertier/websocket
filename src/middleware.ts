@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Routes protégées => besoin d'être connecté
-const protectedPaths = ['/dashboard', '/profile']
+const protectedPaths = ['/dashboard', '/profile', '/message']
 
 // Routes « invitées » => accès uniquement si pas connecté
 const guestPaths = ['/login', '/register']
