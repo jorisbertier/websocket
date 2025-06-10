@@ -5,11 +5,31 @@ import Link from "next/link";
 
 import { Button } from '../components/ui/button'
 import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 
 function Navbar() {
 
     const { user, loading} = useUser();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if(response.ok) {
+                console.log('Logout sucessfull')
+                router.push('/')
+            } else {
+                console.log('Error durantly logout')
+            }
+        } catch(e) {
+            console.log('Error durantly logout: ', e)
+        }
+    }
     
     return (
         <>
@@ -39,9 +59,9 @@ function Navbar() {
                 {!loading && (
                 <Button asChild>
                     {user ? (
-                    <Link href="/logout">Logout</Link>
+                    <button className="cursor-pointer" onClick={handleLogout}>Logout</button>
                     ) : (
-                    <Link href="/login">Connexion</Link>
+                    <Link className="cursor-pointer" href="/login">Connexion</Link>
                     )}
                 </Button>
         )}
