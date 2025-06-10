@@ -13,7 +13,6 @@ export default function MessagesPage() {
 
   const { usersList } = useUsersList();
   const { user} = useUser();
-  console.log('id user connected: ',user.pseudo)
   console.log('userList',usersList)
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
@@ -36,7 +35,6 @@ export default function MessagesPage() {
 
     const deleteUserConnected = usersList.filter((u: User) => u.pseudo?.trim() != user?.pseudo.trim())
     const fiteredUsersList = deleteUserConnected.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
-    console.log('delete', deleteUserConnected)
     setFilteredUsersList(fiteredUsersList)
   };
   const handleAddFriend = async (pseudo: string) => {
@@ -106,7 +104,7 @@ export default function MessagesPage() {
                   >
                     <div className='w-full flex justify-between items-center py-2'>
                       {/* <Image/> */}
-                      <span className='text-lg'>{friend.pseudo}</span>
+                      <span className='text-lg'>{friend?.pseudo}</span>
                       <span onClick={() => handleAddFriend(friend.pseudo)} className='bg-blue-300 rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</span>
                     </div>
                     
@@ -134,9 +132,12 @@ export default function MessagesPage() {
           const sender = usersList.find((u) => u._id === requestId);
           if(!sender) return null;
           return (
-            <li key={requestId}>
-              {sender?.pseudo}
-              {/* Boutons accepter / refuser ici */}
+            <li key={requestId} className='flex justify-between items-center mb-2'>
+              <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
+            <div className="space-x-2">
+              <button className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
+              <button className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
+            </div>
             </li>
           );
         })}
