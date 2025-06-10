@@ -3,7 +3,7 @@
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 // import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface User {
   pseudo: string;
@@ -14,10 +14,16 @@ export default function MessagesPage() {
   const { usersList } = useUsersList();
   const { user} = useUser();
   console.log('userList',usersList)
+  console.log('user: ',user)
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
-  // console.log('filterededList',filteredUsersList)
+  const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
 
+  useEffect(() => {
+    if (user?.friendRequests) {
+      setFriendRequests(user.friendRequests);
+    }
+  }, [user]);
   console.log(typeof Object.values(usersList))
 
 
@@ -65,23 +71,26 @@ export default function MessagesPage() {
 
   const handleAcceptFriend = async(requestId: string) => {
     try {
-      const response = await fetch('http://localhost:3001/api/friendRequest/accept', {
-        method: 'POST',
-        headers: {
-          'Content-type' : 'application/json',
-        },
-        body : JSON.stringify({
-          fromUserId: requestId,
-          toUserId: user?._id,
-        }),
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if(response.ok) {
-        console.log('Request sent')
-      } else {
-        console.log('Error while sending friend request', data.message)
-      }
+      // const response = await fetch('http://localhost:3001/api/friendRequest/accept', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-type' : 'application/json',
+      //   },
+      //   body : JSON.stringify({
+      //     fromUserId: requestId,
+      //     toUserId: user?._id,
+      //   }),
+      //   credentials: 'include'
+      // });
+      // const data = await response.json();
+      // if(response.ok) {
+      //   console.log('Request sent')
+      // } else {
+      //   console.log('Error while sending friend request', data.message)
+      // }
+      
+      setFriendRequests(usersList.filter((user) => user._id !== requestId));
+  
 
     }catch(e) {
       console.log('Error while sending friend request: ', e)
@@ -147,7 +156,7 @@ export default function MessagesPage() {
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Demande recue d'amis</h2>
         <ul className="list-disc list-inside">
-        {user?.friendRequests?.map((requestId: string) => {
+        {friendRequests?.map((requestId: string) => {
           const sender = usersList.find((u) => u._id === requestId);
           console.log('sender', sender)
           if(!sender) return null;
@@ -167,9 +176,13 @@ export default function MessagesPage() {
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Amis</h2>
         <ul className="list-disc list-inside">
-          {friends.map((friend, idx) => (
-            <li key={idx}>{friend}</li>
-          ))}
+          {user?.friends?.map((friendId: string, id) => {
+            const filteredFriends = usersList.filter((user) => user._id === friendId);
+            console.log('friend', filteredFriends)
+            return filteredFriends.map((friend) => (
+              <li className='text-black' key={friend._id}>{friend?.pseudo}</li>
+            ))
+          })}
         </ul>
       </div>
     </div>
