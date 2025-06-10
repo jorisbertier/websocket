@@ -13,10 +13,11 @@ export default function MessagesPage() {
 
   const { usersList } = useUsersList();
   const { user} = useUser();
-  console.log(user?._id)
+  console.log('id user connected: ',user.pseudo)
+  console.log('userList',usersList)
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
-  console.log(filteredUsersList)
+  // console.log('filterededList',filteredUsersList)
 
   console.log(typeof Object.values(usersList))
 
@@ -33,7 +34,9 @@ export default function MessagesPage() {
     const value = e.target.value;
     setNewFriend(value)
 
-    const fiteredUsersList = usersList.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
+    const deleteUserConnected = usersList.filter((u: User) => u.pseudo?.trim() != user?.pseudo.trim())
+    const fiteredUsersList = deleteUserConnected.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
+    console.log('delete', deleteUserConnected)
     setFilteredUsersList(fiteredUsersList)
   };
   const handleAddFriend = async (pseudo: string) => {
@@ -123,7 +126,22 @@ export default function MessagesPage() {
           </button>
         </div>
         </div>
-
+      {/*Demande recue d'amis*/}
+      <div className="bg-white p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Demande recue d'amis</h2>
+        <ul className="list-disc list-inside">
+        {user?.friendRequests?.map((requestId: string) => {
+          const sender = usersList.find((u) => u._id === requestId);
+          if(!sender) return null;
+          return (
+            <li key={requestId}>
+              {sender?.pseudo}
+              {/* Boutons accepter / refuser ici */}
+            </li>
+          );
+        })}
+      </ul>
+      </div>
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Amis</h2>
