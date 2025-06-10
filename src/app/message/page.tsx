@@ -63,6 +63,31 @@ export default function MessagesPage() {
     }
   };
 
+  const handleAcceptFriend = async(requestId: string) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/friendRequest/accept', {
+        method: 'POST',
+        headers: {
+          'Content-type' : 'application/json',
+        },
+        body : JSON.stringify({
+          fromUserId: requestId,
+          toUserId: user?._id,
+        }),
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if(response.ok) {
+        console.log('Request sent')
+      } else {
+        console.log('Error while sending friend request', data.message)
+      }
+
+    }catch(e) {
+      console.log('Error while sending friend request: ', e)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Messagerie</h1>
@@ -82,7 +107,7 @@ export default function MessagesPage() {
       {/* Ajouter un ami */}
   {/* Section Ajout d'ami */}
   <div className="bg-white p-6 rounded-xl shadow-md max-w-md mx-auto mb-10">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Rechercher un ami</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Rechercher un utilisateur</h2>
         
         <div className="flex flex-col gap-4">
           <input
@@ -116,12 +141,6 @@ export default function MessagesPage() {
             </ul>
           )}
 
-          <button
-            onClick={handleAddFriend}
-            className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-all"
-          >
-            Ajouter l'ami
-          </button>
         </div>
         </div>
       {/*Demande recue d'amis*/}
@@ -130,12 +149,13 @@ export default function MessagesPage() {
         <ul className="list-disc list-inside">
         {user?.friendRequests?.map((requestId: string) => {
           const sender = usersList.find((u) => u._id === requestId);
+          console.log('sender', sender)
           if(!sender) return null;
           return (
             <li key={requestId} className='flex justify-between items-center mb-2'>
               <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
             <div className="space-x-2">
-              <button className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
+              <button onClick={() => handleAcceptFriend(sender?._id)} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
               <button className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
             </div>
             </li>

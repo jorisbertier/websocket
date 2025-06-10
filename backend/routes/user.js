@@ -170,7 +170,47 @@ router.post('/friendRequest', async (req, res) => {
         console.log('Request sent')
         res.status(200).json({ message: 'Request sent'})
     } catch (error) {
-        res.status(401).json({ message: 'Invalid token' })
+        res.status(500).json({ message: 'Server error' })
+        console.log(error)
+    }
+})
+
+router.post('/friendRequest/accept', async (req, res) => {
+    const { fromUserId, toUserId} = req.body
+
+    if(!fromUserId || !toUserId) {
+        return res.status(400).json({ message : 'Missing Data'})
+    }
+    try {
+        const user = await User.findById(toUserId);
+        const fromUser = await User.findById(fromUserId);
+        if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
+
+        if(!user.friends) user.friends = [];
+        if (!fromUser.friends) fromUser.friends = [];
+
+        if(!user.friendRequests.includes(fromUserId)) {
+            return res.status(400).json({message : 'No such fiend request'})
+        }
+        
+        if(!user.friends.includes(fromUserId)) {
+            user.friends.push(fromUserId);
+        }
+    
+        if (!fromUser.friends.includes(toUserId)) {
+            fromUser.friends.push(toUserId);
+        }
+
+        user.friendRequests = user.friendRequests.filter(
+            (id) => id.toString() != fromUserId
+        )
+        await user.save()
+        await fromUser.save()
+
+        console.log('Friend request accepted')
+        res.status(200).json({ message: 'Friend request accepted'})
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' })
         console.log(error)
     }
 })
