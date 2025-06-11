@@ -190,7 +190,7 @@ router.post('/friendRequest/accept', async (req, res) => {
         if (!fromUser.friends) fromUser.friends = [];
 
         if(!user.friendRequests.includes(fromUserId)) {
-            return res.status(400).json({message : 'No such fiend request'})
+            return res.status(400).json({message : 'No such friend request'})
         }
         
         if(!user.friends.includes(fromUserId)) {
@@ -209,6 +209,47 @@ router.post('/friendRequest/accept', async (req, res) => {
 
         console.log('Friend request accepted')
         res.status(200).json({ message: 'Friend request accepted'})
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' })
+        console.log(error)
+    }
+})
+
+
+router.post('/friendRequest/reject', async (req, res) => {
+    const { fromUserId, toUserId} = req.body
+
+    if(!fromUserId || !toUserId) {
+        return res.status(400).json({ message : 'Missing Data'})
+    }
+    try {
+        const user = await User.findById(toUserId);
+        const fromUser = await User.findById(fromUserId);
+        if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
+
+        // if(!user.friends) user.friends = [];
+        // if (!fromUser.friends) fromUser.friends = [];
+
+        if(!user.friendRequests.includes(fromUserId)) {
+            return res.status(400).json({message : 'No such friend request'})
+        }
+        
+        // if(!user.friends.includes(fromUserId)) {
+        //     user.friends.push(fromUserId);
+        // }
+    
+        // if (!fromUser.friends.includes(toUserId)) {
+        //     fromUser.friends.push(toUserId);
+        // }
+
+        user.friendRequests = user.friendRequests.filter(
+            (id) => id.toString() != fromUserId
+        )
+        await user.save()
+        // await fromUser.save()
+
+        console.log('Friend request rejected')
+        res.status(200).json({ message: 'Friend request rejected'})
     } catch (error) {
         res.status(500).json({ message: 'Server error' })
         console.log(error)
