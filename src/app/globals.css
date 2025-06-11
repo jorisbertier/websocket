@@ -3,6 +3,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes fade-in-out {
+  0%   { opacity: 0; transform: translateY(20px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+
+@keyframes progress-bar {
+  0%   { width: 100%; }
+  100% { width: 0%; }
+}
+
+/* Classes CSS classiques pour utiliser ces animations */
+.fade-in-out {
+  animation: fade-in-out 2s ease-out forwards;
+}
+
+.progress-bar {
+  animation: progress-bar 2s linear forwards;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

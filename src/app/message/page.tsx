@@ -21,6 +21,7 @@ export default function MessagesPage() {
   const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
 
   const [showModal, setShowModal] = useState(false);
+  const [showModalReject, setShowModalReject] = useState(false);
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -93,11 +94,18 @@ export default function MessagesPage() {
       // }
       
       setFriendRequests(usersList.filter((user) => user._id !== requestId));
+      setShowModal(true)
   
 
     }catch(e) {
       console.log('Error while sending friend request: ', e)
     }
+  }
+
+  const handleRejectFriend = async (requestId: string) => {
+    setFriendRequests(usersList.filter((user) => user._id !== requestId));
+    setShowModalReject(true)
+
   }
 
   return (
@@ -168,14 +176,15 @@ export default function MessagesPage() {
               <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
             <div className="space-x-2">
               <button onClick={() => handleAcceptFriend(sender?._id)} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
-              <button className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
+              <button onClick={() => handleRejectFriend(sender?._id)} className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
             </div>
             </li>
           );
         })}
       </ul>
       </div>
-      <Modal message="Request sent" show={true} onClose={() => setShowModal(false)}/>
+      <Modal message="Request sent" show={showModal} onClose={() => setShowModal(false)}/>
+      <Modal message="Request rejected" show={showModalReject} onClose={() => setShowModalReject(false)}/>
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Amis</h2>
