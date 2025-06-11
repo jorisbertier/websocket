@@ -1,5 +1,6 @@
 "use client"
 
+import Modal from '@/component/Modal';
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 // import Image from 'next/image';
@@ -18,6 +19,8 @@ export default function MessagesPage() {
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
   const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
+
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -172,6 +175,7 @@ export default function MessagesPage() {
         })}
       </ul>
       </div>
+      <Modal message="Request sent" show={true} onClose={() => setShowModal(false)}/>
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Amis</h2>
