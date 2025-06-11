@@ -41,9 +41,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    // useEffect(() => {
-    //     fetchUser();
-    // }, []);
+    useEffect(() => {
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         console.log("User changed in context:", user);

@@ -192,7 +192,12 @@ export default function MessagesPage() {
             const filteredFriends = usersList.filter((user) => user._id === friendId);
 
             return filteredFriends.map((friend) => (
-              <li className='text-black' key={friend._id}>{friend?.pseudo}</li>
+              
+              <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend._id}>
+                <div>{friend?.pseudo}</div>
+                <button className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'>Envoyer un message</button>
+                
+                </li>
             ))
           })}
         </ul>

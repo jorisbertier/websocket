@@ -59,13 +59,15 @@ function Navbar() {
                 )
             }
                 {/* {!loading && ( */}
-                <Button asChild>
-                    {user ? (
-                    <button className="cursor-pointer" onClick={handleLogout}>Logout</button>
-                    ) : (
-                    <Link className="cursor-pointer" href="/login">Connexion</Link>
+                {!loading && (
+                    <Button asChild>
+                        {user ? (
+                        <button className="cursor-pointer" onClick={handleLogout}>Logout</button>
+                        ) : (
+                        <Link className="cursor-pointer" href="/login">Connexion</Link>
+                        )}
+                    </Button>
                     )}
-                </Button>
         {/* )} */}
                 </div>
             </nav>
