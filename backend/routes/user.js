@@ -157,15 +157,23 @@ router.post('/friendRequest', async (req, res) => {
     }
     try {
         const user = await User.findOne({ pseudo : toUserIdPseudo});
+        const userFrom = await User.findById(fromUserId); 
         if(!user) return res.status(400).json({ message: 'User not found'})
+        if(!userFrom) return res.status(400).json({ message: 'UserFrom not found'})
 
         if(!user.friendRequests) user.friendRequests = []
+        if(!userFrom.friendRequestsSent) userFrom.friendRequestsSent = []
 
         if(user.friendRequests.includes(fromUserId)) {
             return res.status(400).json({message : 'Request already sent'})
         }
-        user.friendRequests.push(fromUserId); 
+        if(userFrom.friendRequestsSent.includes(toUserIdPseudo)) {
+            return res.status(400).json({message : 'Friend request already stored'})
+        }
+        user.friendRequests.push(fromUserId);
+        userFrom.friendRequestsSent.push(toUserIdPseudo)
         await user.save()
+        await userFrom.save()
 
         console.log('Request sent')
         res.status(200).json({ message: 'Request sent'})

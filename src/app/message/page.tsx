@@ -8,6 +8,9 @@ import { useEffect, useState } from 'react';
 interface User {
   _id: string;
   pseudo: string;
+  friends?: [];
+  friendRequests?: [],
+  friendRequestsSent?: [],
 }
 
 // interface Message {
@@ -19,7 +22,7 @@ interface User {
 export default function MessagesPage() {
 
   const { usersList } = useUsersList();
-  const { user} = useUser();
+  const { user} = useUser() as { user: User | null };
   // console.log('userList',usersList)
   // console.log('user: ',user)
 
@@ -34,6 +37,7 @@ export default function MessagesPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
+  const [showModalRequestSent, setShowModalRequestSent] = useState(false);
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -53,10 +57,9 @@ export default function MessagesPage() {
     setNewFriend(value)
 
     const deleteUserConnected = usersList.filter((u: User) => u.pseudo?.trim() != user?.pseudo.trim())
-    console.log(deleteUserConnected)
-    console.log(currentFriendsPseudos)
     const deleteFriendToList = deleteUserConnected.filter((u: User) => !currentFriendsPseudos?.includes(u?.pseudo))
-    const fiteredUsersList = deleteFriendToList.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
+    const deleteRequestSent = deleteFriendToList.filter((u: User) => !user?.friendRequestsSent?.includes(u?.pseudo))
+    const fiteredUsersList = deleteRequestSent.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
     setFilteredUsersList(fiteredUsersList)
   };
   const handleAddFriend = async (pseudo: string) => {
@@ -76,10 +79,11 @@ export default function MessagesPage() {
       const data = await response.json();
       if(response.ok) {
         console.log('Request sent')
+        setFilteredUsersList(filteredUsersList.filter((u) => u.pseudo !== pseudo))
+        setShowModalRequestSent(true)
       } else {
         console.log('Error while sending friend request', data.message)
       }
-
     }catch(e) {
       console.log('Error while sending friend request: ', e)
     }
@@ -189,8 +193,22 @@ export default function MessagesPage() {
         {friendRequests.length === 0 && <div className='w-full text-center font-medium'>You don't have any friend request for the moment.</div>}
       </ul>
       </div>
-      <Modal message="Request sent" show={showModal} onClose={() => setShowModal(false)}/>
+      <Modal message="Request accepted" show={showModal} onClose={() => setShowModal(false)}/>
       <Modal message="Request rejected" show={showModalReject} onClose={() => setShowModalReject(false)}/>
+      <Modal message="Request sent" show={showModalRequestSent} onClose={() => setShowModalRequestSent(false)}/>
+
+ {/* List request sent */}
+      <div className="bg-white p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Demande d'amis envoyés</h2>
+        <ul className="list-disc list-inside">
+          {user?.friendRequestsSent.map((request) => (
+            <li key={request} className='flex justify-between w-72'>
+              <div>{request}</div>
+              <button className='p-2 rounded-md bg-red-400'>Cancel request</button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
