@@ -20,8 +20,14 @@ export default function MessagesPage() {
 
   const { usersList } = useUsersList();
   const { user} = useUser();
-  console.log('userList',usersList)
-  console.log('user: ',user)
+  // console.log('userList',usersList)
+  // console.log('user: ',user)
+
+  /* List of friends */
+  const currentFriendsPseudos = user?.friends
+  ?.map((friendId: string) => usersList.find((u) => u._id === friendId))
+  .filter(Boolean)
+  .map((friend) => friend.pseudo?.trim());
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
   const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
@@ -47,7 +53,10 @@ export default function MessagesPage() {
     setNewFriend(value)
 
     const deleteUserConnected = usersList.filter((u: User) => u.pseudo?.trim() != user?.pseudo.trim())
-    const fiteredUsersList = deleteUserConnected.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
+    console.log(deleteUserConnected)
+    console.log(currentFriendsPseudos)
+    const deleteFriendToList = deleteUserConnected.filter((u: User) => !currentFriendsPseudos?.includes(u?.pseudo))
+    const fiteredUsersList = deleteFriendToList.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
     setFilteredUsersList(fiteredUsersList)
   };
   const handleAddFriend = async (pseudo: string) => {
@@ -187,19 +196,13 @@ export default function MessagesPage() {
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Amis</h2>
         <ul className="list-disc list-inside">
-          {user?.friends?.map((friendId: string) => {
-
-            const filteredFriends = usersList.filter((user) => user._id === friendId);
-
-            return filteredFriends.map((friend) => (
-              
-              <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend._id}>
-                <div>{friend?.pseudo}</div>
+          {currentFriendsPseudos?.map((friend: string) => (
+              <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
+                <div>{friend}</div>
                 <button className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'>Envoyer un message</button>
                 
                 </li>
-            ))
-          })}
+          ))}
         </ul>
       </div>
     </div>
