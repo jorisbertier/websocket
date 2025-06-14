@@ -264,20 +264,12 @@ router.post('/friendRequest/cancel', async (req, res) => {
         const fromUser = await User.findById(fromUserId);
         if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
 
-        // if(!user.friends) user.friends = [];
-        // if (!fromUser.friends) fromUser.friends = [];
 
         if(!user.friendRequests.includes(fromUserId)) {
             return res.status(400).json({message : 'No such friend request'})
         }
         
-        // if(!user.friends.includes(fromUserId)) {
-        //     user.friends.push(fromUserId);
-        // }
-    
-        // if (!fromUser.friends.includes(toUserId)) {
-        //     fromUser.friends.push(toUserId);
-        // }
+
 
         user.friendRequests = user.friendRequests.filter(
             (id) => id.toString() != fromUserId
