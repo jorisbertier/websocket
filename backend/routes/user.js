@@ -235,6 +235,35 @@ router.post('/friendRequest/reject', async (req, res) => {
         const fromUser = await User.findById(fromUserId);
         if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
 
+        if(!user.friendRequests.includes(fromUserId)) {
+            return res.status(400).json({message : 'No such friend request'})
+        }
+
+        user.friendRequests = user.friendRequests.filter(
+            (id) => id.toString() != fromUserId
+        )
+        await user.save()
+        // await fromUser.save()
+
+        console.log('Friend request rejected')
+        res.status(200).json({ message: 'Friend request rejected'})
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' })
+        console.log(error)
+    }
+})
+
+router.post('/friendRequest/cancel', async (req, res) => {
+    const { fromUserId, toUserId} = req.body
+
+    if(!fromUserId || !toUserId) {
+        return res.status(400).json({ message : 'Missing Data'})
+    }
+    try {
+        const user = await User.findById(toUserId);
+        const fromUser = await User.findById(fromUserId);
+        if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
+
         // if(!user.friends) user.friends = [];
         // if (!fromUser.friends) fromUser.friends = [];
 

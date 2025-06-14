@@ -23,7 +23,7 @@ export default function MessagesPage() {
 
   const { usersList } = useUsersList();
   const { user} = useUser() as { user: User | null };
-  // console.log('userList',usersList)
+  console.log('userList',usersList)
   // console.log('user: ',user)
 
   /* List of friends */
@@ -39,9 +39,15 @@ export default function MessagesPage() {
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalRequestSent, setShowModalRequestSent] = useState(false);
 
+  const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([])
+  console.log('kdkdk', pendingFriendRequests)
+
   useEffect(() => {
     if (user?.friendRequests) {
       setFriendRequests(user.friendRequests);
+    }
+    if (user?.friendRequestsSent) {
+      setPendingFriendRequests(user.friendRequestsSent);
     }
   }, [user]);
 
@@ -115,6 +121,34 @@ export default function MessagesPage() {
     }catch(e) {
       console.log('Error while sending friend request: ', e)
     }
+  }
+
+  const cancelFriendRequest = async(pseudo: string) => {
+    // try {
+    //   const response = await fetch(`http://localhost:3001/api/friendRequest/cancel`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-type' : 'application/json',
+    //     },
+    //     body : JSON.stringify({
+    //       fromUserId: user?.pseudo,
+    //       toUserId: pseudo,
+    //     }),
+    //     credentials: 'include'
+    //   });
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     console.log(`Request canceled`);
+    setPendingFriendRequests(prev => prev.filter((p) => p !== pseudo));
+
+    //     else setShowModalReject(true);
+    //   } else {
+    //     console.log(`Error while ${action}ing friend request`, data.message);
+    //   }
+
+    // }catch(e) {
+    //   console.log('Error while sending friend request: ', e)
+    // }
   }
 
   return (
@@ -201,10 +235,10 @@ export default function MessagesPage() {
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Demande d'amis envoyés</h2>
         <ul className="list-disc list-inside">
-          {user?.friendRequestsSent.map((request) => (
+          {pendingFriendRequests?.map((request) => (
             <li key={request} className='flex justify-between w-72'>
               <div>{request}</div>
-              <button className='p-2 rounded-md bg-red-400'>Cancel request</button>
+              <button onClick={() => cancelFriendRequest(request)} className='p-2 rounded-md bg-red-400'>Cancel request</button>
             </li>
           ))}
         </ul>
