@@ -124,9 +124,31 @@ export default function MessagesPage() {
   }
 
   const cancelFriendRequest = async(pseudo: string) => {
-
+    // try {
+    //   const response = await fetch(`http://localhost:3001/api/friendRequest/cancel`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-type' : 'application/json',
+    //     },
+    //     body : JSON.stringify({
+    //       fromUserId: user?.pseudo,
+    //       toUserId: pseudo,
+    //     }),
+    //     credentials: 'include'
+    //   });
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     console.log(`Request canceled`);
     setPendingFriendRequests(prev => prev.filter((p) => p !== pseudo));
 
+    //     else setShowModalReject(true);
+    //   } else {
+    //     console.log(`Error while ${action}ing friend request`, data.message);
+    //   }
+
+    // }catch(e) {
+    //   console.log('Error while sending friend request: ', e)
+    // }
   }
 
   return (
