@@ -138,7 +138,7 @@ export default function MessagesPage() {
     //   });
     //   const data = await response.json();
     //   if (response.ok) {
-        console.log(`Request canceled`);
+        // console.log(`Request canceled`);
     setPendingFriendRequests(prev => prev.filter((p) => p !== pseudo));
 
     //     else setShowModalReject(true);
