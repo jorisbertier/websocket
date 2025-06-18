@@ -206,7 +206,7 @@ export default function MessagesPage() {
 
       {/*Demande recue d'amis*/}
       <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Demande recue d'amis</h2>
+        <h2 className="text-xl font-semibold mb-4">Friend request received</h2>
         <ul className="list-disc list-inside">
         {friendRequests?.map((requestId: string) => {
 
@@ -223,7 +223,7 @@ export default function MessagesPage() {
             </li>
           );
         })}
-        {friendRequests.length === 0 && <div className='w-full text-center font-medium'>You don't have any friend request for the moment.</div>}
+        {friendRequests.length === 0 && <div className='w-full text-center font-medium'>You have not received any friend requests.</div>}
       </ul>
       </div>
       <Modal message="Request accepted" show={showModal} onClose={() => setShowModal(false)}/>
@@ -232,7 +232,7 @@ export default function MessagesPage() {
 
  {/* List request sent */}
       <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Demande d'amis envoyés</h2>
+        <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
         <ul className="list-disc list-inside">
           {pendingFriendRequests?.map((request) => (
             <li key={request} className='flex justify-between w-72'>
@@ -241,11 +241,12 @@ export default function MessagesPage() {
             </li>
           ))}
         </ul>
+      {pendingFriendRequests.length === 0 && <div className='w-full text-center font-medium'>You haven't sent any friend requests.</div>}
       </div>
 
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Amis</h2>
+        <h2 className="text-xl font-semibold mb-4">Your friends</h2>
         <ul className="list-disc list-inside">
           {currentFriendsPseudos?.map((friend: string) => (
               <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
@@ -255,6 +256,7 @@ export default function MessagesPage() {
                 </li>
           ))}
         </ul>
+        {currentFriendsPseudos?.length === 0 && <div className='w-full text-center font-medium'>You don't have any friend for the moment.</div>}
       </div>
     </div>
   );
