@@ -255,20 +255,20 @@ router.post('/friendRequest/reject', async (req, res) => {
 })
 
 router.post('/friendRequest/cancel', auth , async (req, res) => {
-    const { fromUserId, toUserId} = req.body
+    const { fromUserPseudo, toUserPseudo } = req.body
 
-    if(!fromUserId || !toUserId) {
+    if(!fromUserPseudo || !toUserPseudo) {
         return res.status(400).json({ message : 'Missing Data'})
     }
-    
+
     console.log('req user', req.user?.pseudo)
-    if (req.user.pseudo !== fromUserId) {
+    if (req.user.pseudo !== fromUserPseudo) {
         return res.status(403).json({ message: 'Unauthorized' });
     }
 
     try {
-        const user = await User.findOne({ pseudo : toUserId});
-        const fromUser = await User.findOne({ pseudo : fromUserId});
+        const user = await User.findOne({ pseudo : toUserPseudo});
+        const fromUser = await User.findOne({ pseudo : fromUserPseudo});
 
         
         if(!user || !fromUser) return res.status(404).json({ message: 'User not found'});
@@ -277,18 +277,18 @@ router.post('/friendRequest/cancel', auth , async (req, res) => {
         if (!Array.isArray(fromUser.friendRequestsSent)) fromUser.friendRequestsSent = [];
 
         user.friendRequests = user.friendRequests.filter(
-            (id) => id.toString() != fromUser._id
+            (id) => id.toString() !== fromUser._id
         );
 
         fromUser.friendRequestsSent = fromUser.friendRequestsSent.filter(
-            (pseudo) => pseudo != user.pseudo
+            (pseudo) => pseudo !== user.pseudo
         );
 
         await user.save()
         await fromUser.save()
 
-        console.log('Friend request cancel')
-        res.status(200).json({ message: 'Friend request cancel'})
+        console.log(`[CANCEL] ${fromUser.pseudo} canceled request to ${user.pseudo}`);
+        res.status(200).json({ message: 'Friend request canceled'})
     } catch (error) {
         res.status(500).json({ message: 'Server error' })
         console.log(error)

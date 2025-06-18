@@ -131,8 +131,8 @@ export default function MessagesPage() {
           'Content-type' : 'application/json',
         },
         body : JSON.stringify({
-          fromUserId: user?.pseudo,
-          toUserId: pseudo,
+          fromUserPseudo: user?.pseudo,
+          toUserPseudo: pseudo,
         }),
         credentials: 'include'
       });
