@@ -259,26 +259,34 @@ router.post('/friendRequest/cancel', async (req, res) => {
     if(!fromUserId || !toUserId) {
         return res.status(400).json({ message : 'Missing Data'})
     }
+    // console.log('req user', req.user?.pseudo)
+    // if (req.user?.pseudo !== fromUserId) {
+    //     return res.status(403).json({ message: 'Unauthorized' });
+    // }
+
     try {
-        const user = await User.findById(toUserId);
-        const fromUser = await User.findById(fromUserId);
-        if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
+        const user = await User.findOne({ pseudo : toUserId});
+        const fromUser = await User.findOne({ pseudo : fromUserId});
 
-
-        if(!user.friendRequests.includes(fromUserId)) {
-            return res.status(400).json({message : 'No such friend request'})
-        }
         
+        if(!user || !fromUser) return res.status(404).json({ message: 'User not found'});
 
+        if (!Array.isArray(user.friendRequests)) user.friendRequests = [];
+        if (!Array.isArray(fromUser.friendRequestsSent)) fromUser.friendRequestsSent = [];
 
         user.friendRequests = user.friendRequests.filter(
-            (id) => id.toString() != fromUserId
-        )
-        await user.save()
-        // await fromUser.save()
+            (id) => id.toString() != fromUser._id
+        );
 
-        console.log('Friend request rejected')
-        res.status(200).json({ message: 'Friend request rejected'})
+        fromUser.friendRequestsSent = fromUser.friendRequestsSent.filter(
+            (pseudo) => pseudo != user.pseudo
+        );
+
+        await user.save()
+        await fromUser.save()
+
+        console.log('Friend request cancel')
+        res.status(200).json({ message: 'Friend request cancel'})
     } catch (error) {
         res.status(500).json({ message: 'Server error' })
         console.log(error)
