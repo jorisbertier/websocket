@@ -178,12 +178,17 @@ router.post('/friendRequest', async (req, res) => {
     }
 })
 
-router.post('/friendRequest/accept', async (req, res) => {
+router.post('/friendRequest/accept', auth, async (req, res) => {
     const { fromUserId, toUserId} = req.body
 
     if(!fromUserId || !toUserId) {
         return res.status(400).json({ message : 'Missing Data'})
     }
+
+    if (req.user._id.toString() !== toUserId) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     try {
         const user = await User.findById(toUserId);
         const fromUser = await User.findById(fromUserId);
@@ -206,6 +211,10 @@ router.post('/friendRequest/accept', async (req, res) => {
 
         user.friendRequests = user.friendRequests.filter(
             (id) => id.toString() != fromUserId
+        )
+
+        fromUser.friendRequestsSent = fromUser.friendRequestsSent.filter(
+            (pseudo) => pseudo !== user.pseudo
         )
         await user.save()
         await fromUser.save()
