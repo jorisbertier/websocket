@@ -2,9 +2,10 @@ import { User }  from '../models/user.js';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken'
-const router = express.Router()
+import jwt from 'jsonwebtoken';
+import auth from '../middleware/auth.js';
 
+const router = express.Router()
 
 router.post('/register', async (req, res) => {
     const { name, email, pseudo, password} = req.body;
@@ -253,16 +254,17 @@ router.post('/friendRequest/reject', async (req, res) => {
     }
 })
 
-router.post('/friendRequest/cancel', async (req, res) => {
+router.post('/friendRequest/cancel', auth , async (req, res) => {
     const { fromUserId, toUserId} = req.body
 
     if(!fromUserId || !toUserId) {
         return res.status(400).json({ message : 'Missing Data'})
     }
-    // console.log('req user', req.user?.pseudo)
-    // if (req.user?.pseudo !== fromUserId) {
-    //     return res.status(403).json({ message: 'Unauthorized' });
-    // }
+    
+    console.log('req user', req.user?.pseudo)
+    if (req.user.pseudo !== fromUserId) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
 
     try {
         const user = await User.findOne({ pseudo : toUserId});
