@@ -144,12 +144,17 @@ router.get('/usersList', async (req, res) => {
     }
 })
 
-router.post('/friendRequest', async (req, res) => {
-    const { fromUserId, toUserIdPseudo} = req.body
+router.post('/friendRequest', auth, async (req, res) => {
+    const { fromUserId, toUserIdPseudo} = req.body;
 
     if(!fromUserId || !toUserIdPseudo) {
         return res.status(400).json({ message : 'Missing Data'})
     }
+
+    if (req.user._id.toString() !== fromUserId) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     try {
         const user = await User.findOne({ pseudo : toUserIdPseudo});
         const userFrom = await User.findById(fromUserId); 
@@ -162,16 +167,18 @@ router.post('/friendRequest', async (req, res) => {
         if(user.friendRequests.includes(fromUserId)) {
             return res.status(400).json({message : 'Request already sent'})
         }
+
         if(userFrom.friendRequestsSent.includes(toUserIdPseudo)) {
             return res.status(400).json({message : 'Friend request already stored'})
         }
         user.friendRequests.push(fromUserId);
-        userFrom.friendRequestsSent.push(toUserIdPseudo)
-        await user.save()
-        await userFrom.save()
+        userFrom.friendRequestsSent.push(toUserIdPseudo);
 
-        console.log('Request sent')
-        res.status(200).json({ message: 'Request sent'})
+        await user.save();
+        await userFrom.save();
+
+        console.log(`Request sent from ${userFrom} to ${user}`)
+        res.status(200).json({ message: 'Request sent'}) 
     } catch (error) {
         res.status(500).json({ message: 'Server error' })
         console.log(error)
