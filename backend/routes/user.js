@@ -134,14 +134,8 @@ router.get('/me', async (req, res) => {
 })
 
 router.get('/usersList', async (req, res) => {
-    
-    // const token = req.cookies.token;
-    // if(!token) {
-    //     return res.status(401).json({ message: 'Unauthorized'})
-    // }
-    
+
     try {
-        // const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const users = await User.find({}, { pseudo: 1 });
         res.status(200).json(users)
     } catch (error) {
@@ -225,15 +219,21 @@ router.post('/friendRequest/accept', async (req, res) => {
 })
 
 
-router.post('/friendRequest/reject', async (req, res) => {
+router.post('/friendRequest/reject', auth, async (req, res) => {
     const { fromUserId, toUserId} = req.body
 
     if(!fromUserId || !toUserId) {
         return res.status(400).json({ message : 'Missing Data'})
     }
+
+    if (req.user._id.toString() !== toUserId) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     try {
         const user = await User.findById(toUserId);
         const fromUser = await User.findById(fromUserId);
+
         if(!user || !fromUser) return res.status(404).json({ message: 'User not found'})
 
         if(!user.friendRequests.includes(fromUserId)) {
@@ -243,8 +243,13 @@ router.post('/friendRequest/reject', async (req, res) => {
         user.friendRequests = user.friendRequests.filter(
             (id) => id.toString() != fromUserId
         )
+
+        fromUser.friendRequestsSent = fromUser.friendRequestsSent.filter(
+            (pseudo) => pseudo !== user.pseudo
+        )
+
         await user.save()
-        // await fromUser.save()
+        await fromUser.save()
 
         console.log('Friend request rejected')
         res.status(200).json({ message: 'Friend request rejected'})
@@ -261,7 +266,6 @@ router.post('/friendRequest/cancel', auth , async (req, res) => {
         return res.status(400).json({ message : 'Missing Data'})
     }
 
-    console.log('req user', req.user?.pseudo)
     if (req.user.pseudo !== fromUserPseudo) {
         return res.status(403).json({ message: 'Unauthorized' });
     }
