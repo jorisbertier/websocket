@@ -4,6 +4,7 @@ import Modal from '@/component/Modal';
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 import { useEffect, useState } from 'react';
+import { sendFriendRequest } from '../../api/api'
 
 interface User {
   _id: string;
@@ -51,11 +52,6 @@ export default function MessagesPage() {
     }
   }, [user]);
 
-
-  // const [messages, setMessages] = useState<Message[]>([
-  //   { id: 1, from: 'Alice', text: 'Salut, ça va ?' },
-  //   { id: 2, from: 'Bob', text: 'On se voit ce week-end ?' },
-  // ]);
   const [newFriend, setNewFriend] = useState('');
 
   const handleSearchFriend = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,30 +64,17 @@ export default function MessagesPage() {
     const fiteredUsersList = deleteRequestSent.filter((user: User) => user.pseudo?.trim().includes(value.trim()))
     setFilteredUsersList(fiteredUsersList)
   };
-  const handleAddFriend = async (pseudo: string) => {
 
-    try {
-      const response = await fetch('http://localhost:3001/api/friendRequest', {
-        method: 'POST',
-        headers: {
-          'Content-type' : 'application/json',
-        },
-        body : JSON.stringify({
-          fromUserId: user?._id,
-          toUserIdPseudo: pseudo,
-        }),
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if(response.ok) {
-        console.log('Request sent')
-        setFilteredUsersList(filteredUsersList.filter((u) => u.pseudo !== pseudo))
-        setShowModalRequestSent(true)
-      } else {
-        console.log('Error while sending friend request', data.message)
-      }
-    }catch(e) {
-      console.log('Error while sending friend request: ', e)
+  const handleAddFriend = async (pseudo: string) => {
+    
+    const result = await sendFriendRequest(user?._id, pseudo);
+
+    if (result.success) {
+      console.log('Request sent');
+      setFilteredUsersList(filteredUsersList.filter((u) => u.pseudo !== pseudo));
+      setShowModalRequestSent(true);
+    } else {
+      console.log('Error while sending friend request:', result.message);
     }
   };
 
