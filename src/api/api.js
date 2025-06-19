@@ -20,25 +20,52 @@ export async function get(url) {
 export const sendFriendRequest = async (fromUserId, toUserIdPseudo) => {
     try {
         const response = await fetch('http://localhost:3001/api/friendRequest', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            fromUserId,
-            toUserIdPseudo,
-        }),
-        credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fromUserId,
+                toUserIdPseudo,
+            }),
+            credentials: 'include',
         });
 
         const data = await response.json();
 
         if (response.ok) {
-        return { success: true, data };
+            return { success: true, data };
         } else {
-        return { success: false, message: data.message };
+            return { success: false, message: data.message };
         }
     } catch (error) {
         return { success: false, message: error.message };
+    }
+};
+
+
+export const respondToFriendRequest = async (requestId, toUserId, action) => {
+    try {
+    const response = await fetch(`http://localhost:3001/api/friendRequest/${action}`, {
+        method: 'POST',
+        headers: {
+        'Content-type' : 'application/json',
+        },
+        body : JSON.stringify({
+        fromUserId: requestId,
+        toUserId: toUserId,
+        }),
+        credentials: 'include'
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+        return { success: true, action, data };
+    } else {
+        return { success: false, message: data.message };
+    }
+
+    }catch(e) {
+        console.log('Error while sending friend request: ', e)
     }
 };

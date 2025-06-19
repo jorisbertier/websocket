@@ -4,7 +4,7 @@ import Modal from '@/component/Modal';
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 import { useEffect, useState } from 'react';
-import { sendFriendRequest } from '../../api/api'
+import { sendFriendRequest, respondToFriendRequest } from '../../api/api'
 
 interface User {
   _id: string;
@@ -66,7 +66,7 @@ export default function MessagesPage() {
   };
 
   const handleAddFriend = async (pseudo: string) => {
-    
+
     const result = await sendFriendRequest(user?._id, pseudo);
 
     if (result.success) {
@@ -78,31 +78,17 @@ export default function MessagesPage() {
     }
   };
 
-  const respondToFriendRequest = async(requestId: string, action: 'accept' | 'reject') => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/friendRequest/${action}`, {
-        method: 'POST',
-        headers: {
-          'Content-type' : 'application/json',
-        },
-        body : JSON.stringify({
-          fromUserId: requestId,
-          toUserId: user?._id,
-        }),
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log(`Request ${action}ed`);
-        setFriendRequests((prev) => prev.filter((id) => id !== requestId));
-        if (action === 'accept') setShowModal(true);
-        else setShowModalReject(true);
-      } else {
-        console.log(`Error while ${action}ing friend request`, data.message);
-      }
+  const handleRespond = async(requestId: string, action: string) => {
+    
+    const result = await respondToFriendRequest(requestId, user?._id, action);
 
-    }catch(e) {
-      console.log('Error while sending friend request: ', e)
+    if (result?.success) {
+      console.log(`Request ${action}ed`);
+      setFriendRequests((prev) => prev.filter((id) => id !== requestId));
+      if (action === 'accept') setShowModal(true);
+      else setShowModalReject(true);
+    } else {
+      console.log('Error while sending friend request:', result.message);
     }
   }
 
@@ -200,8 +186,8 @@ export default function MessagesPage() {
             <li key={requestId} className='flex justify-between items-center mb-2'>
               <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
             <div className="space-x-2">
-              <button onClick={() => respondToFriendRequest(sender?._id, 'accept')} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
-              <button onClick={() => respondToFriendRequest(sender?._id, 'reject')} className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
+              <button onClick={() => handleRespond(sender?._id, 'accept')} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
+              <button onClick={() => handleRespond(sender?._id, 'reject')} className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
             </div>
             </li>
           );
