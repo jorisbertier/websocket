@@ -4,7 +4,7 @@ import Modal from '@/component/Modal';
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 import { useEffect, useState } from 'react';
-import { sendFriendRequest, respondToFriendRequest } from '../../api/api'
+import { sendFriendRequest, respondToFriendRequest, cancelFriendRequest } from '../../api/api'
 
 interface User {
   _id: string;
@@ -41,7 +41,6 @@ export default function MessagesPage() {
   const [showModalRequestSent, setShowModalRequestSent] = useState(false);
 
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([])
-  console.log('kdkdk', pendingFriendRequests)
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -79,7 +78,7 @@ export default function MessagesPage() {
   };
 
   const handleRespond = async(requestId: string, action: string) => {
-    
+
     const result = await respondToFriendRequest(requestId, user?._id, action);
 
     if (result?.success) {
@@ -88,34 +87,20 @@ export default function MessagesPage() {
       if (action === 'accept') setShowModal(true);
       else setShowModalReject(true);
     } else {
-      console.log('Error while sending friend request:', result.message);
+      console.log('Error while sending friend request:', result?.message);
     }
   }
 
-  const cancelFriendRequest = async(pseudo: string) => {
-    try {
-      const response = await fetch(`http://localhost:3001/api/friendRequest/cancel`, {
-        method: 'POST',
-        headers: {
-          'Content-type' : 'application/json',
-        },
-        body : JSON.stringify({
-          fromUserPseudo: user?.pseudo,
-          toUserPseudo: pseudo,
-        }),
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (response.ok) {
+  const handleCancelFriendRequest = async(pseudo: string) => {
+
+    const result = await cancelFriendRequest(pseudo, user?.pseudo);
+
+    if (result?.success) {
         console.log(`Request canceled`);
         setPendingFriendRequests(prev => prev.filter((p) => p !== pseudo));
-        // setShowModalReject(true);
-      } else {
-        console.log(`Error while canceling friend request`, data.message);
-      }
-
-    }catch(e) {
-      console.log('Error while canceling friend request: ', e)
+        setShowModalReject(true);
+    } else {
+      console.log('Error while sending friend request:', result?.message);
     }
   }
 
@@ -206,7 +191,7 @@ export default function MessagesPage() {
           {pendingFriendRequests?.map((request) => (
             <li key={request} className='flex justify-between w-72'>
               <div>{request}</div>
-              <button onClick={() => cancelFriendRequest(request)} className='p-2 rounded-md bg-red-400'>Cancel request</button>
+              <button onClick={() => handleCancelFriendRequest(request)} className='p-2 rounded-md bg-red-400'>Cancel request</button>
             </li>
           ))}
         </ul>

@@ -69,3 +69,29 @@ export const respondToFriendRequest = async (requestId, toUserId, action) => {
         console.log('Error while sending friend request: ', e)
     }
 };
+
+export const cancelFriendRequest = async (pseudo, fromUserPseudo) => {
+    try {
+        const response = await fetch(`http://localhost:3001/api/friendRequest/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-type' : 'application/json',
+        },
+        body : JSON.stringify({
+            fromUserPseudo: fromUserPseudo,
+            toUserPseudo: pseudo,
+        }),
+        credentials: 'include'
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+        return { success: true, data };
+    } else {
+        return { success: false, message: data.message };
+    }
+
+    }catch(e) {
+        console.log('Error while canceling friend request: ', e)
+    }
+};

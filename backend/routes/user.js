@@ -289,6 +289,7 @@ router.post('/friendRequest/cancel', auth , async (req, res) => {
     try {
         const user = await User.findOne({ pseudo : toUserPseudo});
         const fromUser = await User.findOne({ pseudo : fromUserPseudo});
+        console.log('From user._id:', fromUser._id) 
 
         
         if(!user || !fromUser) return res.status(404).json({ message: 'User not found'});
@@ -296,16 +297,20 @@ router.post('/friendRequest/cancel', auth , async (req, res) => {
         if (!Array.isArray(user.friendRequests)) user.friendRequests = [];
         if (!Array.isArray(fromUser.friendRequestsSent)) fromUser.friendRequestsSent = [];
 
-        user.friendRequests = user.friendRequests.filter(
-            (id) => id.toString() !== fromUser._id
-        );
+                // moi correct
 
         fromUser.friendRequestsSent = fromUser.friendRequestsSent.filter(
             (pseudo) => pseudo !== user.pseudo
         );
 
-        await user.save()
-        await fromUser.save()
+
+        // receptionneur faux
+        user.friendRequests = user.friendRequests.filter(
+            (id) => id.toString() !== fromUser._id.toString()
+        );
+
+        await user.save();
+        await fromUser.save();
 
         console.log(`[CANCEL] ${fromUser.pseudo} canceled request to ${user.pseudo}`);
         res.status(200).json({ message: 'Friend request canceled'})
