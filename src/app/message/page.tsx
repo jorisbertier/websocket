@@ -22,7 +22,7 @@ interface User {
 
 export default function MessagesPage() {
 
-  const { usersList } = useUsersList();
+  const { usersList } = useUsersList() as { usersList: User[] };
   const { user} = useUser() as { user: User | null };
   console.log('userList',usersList)
   // console.log('user: ',user)
@@ -31,7 +31,7 @@ export default function MessagesPage() {
   const currentFriendsPseudos = user?.friends
   ?.map((friendId: string) => usersList.find((u) => u._id === friendId))
   .filter(Boolean)
-  .map((friend) => friend.pseudo?.trim());
+  .map((friend) => friend?.pseudo?.trim());
 
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
   const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
@@ -139,12 +139,12 @@ export default function MessagesPage() {
                 filteredUsersList.map((friend) => (
                   <li
                     key={friend._id}
-                    className="px-4 py-2 hover:bg-blue-100 w-full cursor-pointer transition-all"
+                    className="px-4 py-2 hover:bg-blue-100 w-full transition-all"
                   >
                     <div className='w-full flex justify-between items-center py-2'>
                       {/* <Image/> */}
                       <span className='text-lg'>{friend?.pseudo}</span>
-                      <button aria-label='add a friend request' onClick={() => handleAddFriend(friend.pseudo)} className='bg-blue-300 rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</button>
+                      <button aria-label='add a friend request' onClick={() => handleAddFriend(friend.pseudo)} className='bg-blue-300 cursor-pointer rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</button>
                     </div>
                     
                   </li>
@@ -201,11 +201,12 @@ export default function MessagesPage() {
       {/* Liste d'amis */}
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Your friends</h2>
-        <ul className="list-disc list-inside">
-          {currentFriendsPseudos?.map((friend: string) => (
+        <ul className="list-disc list-inside w-full">
+          {currentFriendsPseudos?.map((friend) => (
               <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
                 <div>{friend}</div>
-                <button className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'>Envoyer un message</button>
+                <button className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'>Send a message</button>
+                <button className='p-2 bg-red-300 hover:bg-blue-200 rounded-md cursor-pointer'>Delete friend</button>
                 
                 </li>
           ))}
