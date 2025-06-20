@@ -55,6 +55,7 @@ function Navbar() {
                 ) : (
                     <>
                     <Link href="/message">message</Link>
+                    <Link href="/profile">profile</Link>
                     </>
                 )
             }

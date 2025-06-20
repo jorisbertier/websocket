@@ -24,8 +24,8 @@ const Profile: React.FC = () => {
     console.log('ici', user)
 
     const [formData, setFormData] = useState({
-        username: userT.username,
-        email: userT.email,
+        username: user?.name,
+        email: user?.email,
         bio: userT.bio,
     });
 
