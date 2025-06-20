@@ -12,7 +12,7 @@ interface User {
     // avatarUrl: string;
 }
 
-const Profil: React.FC = () => {
+const Profile: React.FC = () => {
     const [userT, setUser] = useState({
         username: 'JorisDev',
         email: 'joris@example.com',
@@ -124,4 +124,4 @@ const Profil: React.FC = () => {
     );
 };
 
-export default Profil;
+export default Profile;
