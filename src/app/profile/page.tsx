@@ -21,7 +21,6 @@ const Profile: React.FC = () => {
     });
 
     const { user } = useUser() as { user : User | null}
-    console.log('ici', user)
 
     const [formData, setFormData] = useState({
         username: user?.name,
@@ -73,7 +72,7 @@ const Profile: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-               Pseudo
+                Pseudo
             </label>
             <input
                 type="text"
