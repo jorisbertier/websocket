@@ -161,6 +161,23 @@ export default function MessagesPage() {
     }
   }
 
+  const [conversations, setConversations] = useState<User[]>([]);
+
+useEffect(() => {
+  const fetchConversations = async () => {
+    if (!user?._id) return;
+
+    const res = await fetch(`http://localhost:3001/api/messages/conversations/${user._id}`);
+    const interlocutorIds: string[] = await res.json();
+
+    const convUsers = usersList.filter((u) => interlocutorIds.includes(u._id));
+    console.log('con user', interlocutorIds)
+    setConversations(convUsers);
+  };
+
+  fetchConversations();
+}, [user, usersList]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Messagerie</h1>
@@ -305,6 +322,29 @@ export default function MessagesPage() {
           </div>
         )}
       </div>
+      <div className="bg-white p-4 rounded shadow mb-6">
+      <h2 className="text-xl font-semibold mb-4">Your conversations</h2>
+      {conversations.length > 0 ? (
+        <ul className="space-y-2">
+          {conversations.map((convUser) => (
+            <li key={convUser._id} className="flex justify-between items-center">
+              <span>{convUser.pseudo}</span>
+              <button
+                onClick={() => {
+                  setChatFriend(convUser._id);
+                  fetchMessages(convUser._id);
+                }}
+                className="text-blue-600 hover:underline"
+              >
+                Open Chat
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500 italic">No active conversations.</p>
+      )}
+    </div>
     </div>
   );
 }
