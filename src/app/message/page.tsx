@@ -6,6 +6,8 @@ import { useUsersList } from '@/hooks/useUsersList';
 import { useEffect, useState } from 'react';
 import { sendFriendRequest, respondToFriendRequest, cancelFriendRequest } from '../../api/api';
 import useSocket from '@/hooks/useSocket';
+import { useRef } from 'react';
+
 
 interface User {
   _id: string;
@@ -48,44 +50,54 @@ export default function MessagesPage() {
   const [chatMessage, setChatMessage] = useState('');
   const [messages, setMessages] = useState<{from: string, text: string}[]>([]);
   const socketRef = useSocket(user?._id);
-useEffect(() => {
-  if (!socketRef.current) return;
 
-  const handleIncomingMessage = ({ fromUserId, toUserId, message }: any) => {
-    // On n’ajoute que si on est dans la bonne conversation
-    if (fromUserId === chatFriend || toUserId === chatFriend) {
-      setMessages(prev => [...prev, { from: fromUserId, text: message }]);
+  
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    const handleIncomingMessage = ({ fromUserId, toUserId, message }: any) => {
+      // On n’ajoute que si on est dans la bonne conversation
+      if (fromUserId === chatFriend || toUserId === chatFriend) {
+        setMessages(prev => [...prev, { from: fromUserId, text: message }]);
+      }
+    };
+
+    socketRef.current.on('private_message', handleIncomingMessage);
+
+    return () => {
+      socketRef.current?.off('private_message', handleIncomingMessage);
+    };
+  }, [socketRef, chatFriend]);
+
+  const handleSendMessage = () => {
+    if (socketRef.current && chatFriend && user?._id) {
+      socketRef.current.emit('private_message', {
+        toUserId: chatFriend,
+        fromUserId: user._id,
+        message: chatMessage
+      });
+
+      setMessages(prev => [...prev, { from: user._id, text: chatMessage }]);
+      setChatMessage('');
     }
   };
 
-  socketRef.current.on('private_message', handleIncomingMessage);
-
-  return () => {
-    socketRef.current?.off('private_message', handleIncomingMessage);
+  const fetchMessages = async (friendId: string) => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/messages/${user?._id}/${friendId}`);
+      const data = await res.json();
+      console.log('Message envoyé to ', friendId)
+      setMessages(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des messages', error);
+    }
   };
-}, [socketRef, chatFriend]);
-const handleSendMessage = () => {
-  if (socketRef.current && chatFriend && user?._id) {
-    socketRef.current.emit('private_message', {
-      toUserId: chatFriend,
-      fromUserId: user._id,
-      message: chatMessage
-    });
 
-    setMessages(prev => [...prev, { from: user._id, text: chatMessage }]);
-    setChatMessage('');
-  }
-};
-const fetchMessages = async (friendId: string) => {
-  try {
-    const res = await fetch(`http://localhost:3001/api/messages/${user?._id}/${friendId}`);
-    const data = await res.json();
-    console.log('Message envoyé to ', friendId)
-    setMessages(data);
-  } catch (error) {
-    console.error('Erreur lors du chargement des messages', error);
-  }
-};
+  useEffect(() => {
+  bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+}, [messages]);
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -277,6 +289,7 @@ const fetchMessages = async (friendId: string) => {
                   <span className="inline-block bg-gray-200 px-3 py-1 rounded">{msg.text}</span>
                 </div>
               ))}
+              <div ref={bottomRef}></div>
             </div>
             <div className="flex gap-2">
               <input
