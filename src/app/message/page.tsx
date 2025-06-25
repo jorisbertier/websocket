@@ -4,7 +4,8 @@ import Modal from '@/component/Modal';
 import { useUser } from '@/hooks/useUser';
 import { useUsersList } from '@/hooks/useUsersList';
 import { useEffect, useState } from 'react';
-import { sendFriendRequest, respondToFriendRequest, cancelFriendRequest } from '../../api/api'
+import { sendFriendRequest, respondToFriendRequest, cancelFriendRequest } from '../../api/api';
+import useSocket from '@/hooks/useSocket';
 
 interface User {
   _id: string;
@@ -40,7 +41,51 @@ export default function MessagesPage() {
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalRequestSent, setShowModalRequestSent] = useState(false);
 
-  const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([])
+  const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
+
+  /* CHAT Socket */
+  const [chatFriend, setChatFriend] = useState<string | null>(null);
+  const [chatMessage, setChatMessage] = useState('');
+  const [messages, setMessages] = useState<{from: string, text: string}[]>([]);
+  const socketRef = useSocket(user?._id);
+useEffect(() => {
+  if (!socketRef.current) return;
+
+  const handleIncomingMessage = ({ fromUserId, toUserId, message }: any) => {
+    // On n’ajoute que si on est dans la bonne conversation
+    if (fromUserId === chatFriend || toUserId === chatFriend) {
+      setMessages(prev => [...prev, { from: fromUserId, text: message }]);
+    }
+  };
+
+  socketRef.current.on('private_message', handleIncomingMessage);
+
+  return () => {
+    socketRef.current?.off('private_message', handleIncomingMessage);
+  };
+}, [socketRef, chatFriend]);
+const handleSendMessage = () => {
+  if (socketRef.current && chatFriend && user?._id) {
+    socketRef.current.emit('private_message', {
+      toUserId: chatFriend,
+      fromUserId: user._id,
+      message: chatMessage
+    });
+
+    setMessages(prev => [...prev, { from: user._id, text: chatMessage }]);
+    setChatMessage('');
+  }
+};
+const fetchMessages = async (friendId: string) => {
+  try {
+    const res = await fetch(`http://localhost:3001/api/messages/${user?._id}/${friendId}`);
+    const data = await res.json();
+    console.log('Message envoyé to ', friendId)
+    setMessages(data);
+  } catch (error) {
+    console.error('Erreur lors du chargement des messages', error);
+  }
+};
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -205,13 +250,47 @@ export default function MessagesPage() {
           {currentFriendsPseudos?.map((friend) => (
               <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
                 <div>{friend}</div>
-                <button className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'>Send a message</button>
+                <button
+                  className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'
+                  onClick={() => {
+                    const friendObj = usersList.find(u => u.pseudo === friend);
+                      const id = friendObj?._id || null;
+                      setMessages([]);
+                      setChatFriend(id);
+                      if (id) fetchMessages(id);
+                  }}
+                >
+                  Send a message
+                </button>
                 <button className='p-2 bg-red-300 hover:bg-blue-200 rounded-md cursor-pointer'>Delete friend</button>
                 
                 </li>
           ))}
         </ul>
         {currentFriendsPseudos?.length === 0 && <div className='w-full text-center font-medium'>You don't have any friend for the moment.</div>}
+        {chatFriend && (
+          <div className="bg-white p-4 mt-6 rounded shadow-md max-w-md mx-auto">
+            <h3 className="text-xl font-semibold mb-2">Chat with ${chatFriend} </h3>
+            <div className="border h-40 overflow-y-auto mb-2 p-2">
+              {messages.map((msg, idx) => (
+                <div key={idx} className={`mb-1 ${msg.from === user?._id ? 'text-right' : 'text-left'}`}>
+                  <span className="inline-block bg-gray-200 px-3 py-1 rounded">{msg.text}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                className="border p-2 flex-1 rounded"
+                placeholder="Message..."
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+              />
+              <button onClick={handleSendMessage} className="bg-blue-500 text-white px-4 py-2 rounded">
+                Envoyer
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
