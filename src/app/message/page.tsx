@@ -97,7 +97,7 @@ export default function MessagesPage() {
   };
 
   useEffect(() => {
-  bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+  // bottomRef.current?.scrollIntoView({ behavior: 'auto' });
 }, [messages]);
 
   useEffect(() => {
