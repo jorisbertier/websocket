@@ -37,6 +37,7 @@ export default function MessagesPage() {
   .filter(Boolean)
   .map((friend) => friend?.pseudo?.trim());
 
+  const [ showFriends, setShowFriends] = useState(false);
   const [ filteredUsersList, setFilteredUsersList] = useState<User[]>([])
   const [friendRequests, setFriendRequests] = useState<string[]>(user?.friendRequests || []);
 
@@ -335,11 +336,67 @@ export default function MessagesPage() {
 //       )}
 //     </div>
 //     </div>
-<div className='h-screen flex'>
-  <div className='w-1/5 bg-green-200 h-full'></div>
+<div className='h-screen flex relative'>
+  {showFriends &&
+    <div className={`bg-white p-6 rounded-xl shadow-md max-w-md mx-auto mb-10 absolute z-10 top-1/2 left-1/2 w-1/4 -translate-x-1/2 -translate-y-1/2`}>
+      <div className='w-full text-right p-2 cursor-pointer' onClick={() => setShowFriends(false)}>X</div>
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Rechercher un utilisateur</h2>
+      
+      <div className="flex flex-col gap-4">
+      <input
+          type="text"
+        placeholder="Entrez un pseudo..."
+          value={newFriend}
+          onChange={handleSearchFriend}
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+
+        {newFriend && (
+          <ul className="bg-gray-50 border border-gray-200 rounded-lg shadow-inner max-h-40 overflow-y-auto">
+            {filteredUsersList.length > 0 ? (
+              filteredUsersList.map((friend) => (
+                <li
+                  key={friend._id}
+                  className="px-4 py-2 hover:bg-blue-100 w-full transition-all"
+                >
+                  <div className='w-full flex justify-between items-center py-2'>
+                    {/* <Image/> */}
+                    <span className='text-lg'>{friend?.pseudo}</span>
+                    <button aria-label='add a friend request' onClick={() => handleAddFriend(friend.pseudo)} className='bg-blue-300 cursor-pointer rounded-md w-8 h-8 flex justify-center items-center hover:bg-blue-200'>+</button>
+                  </div>
+                  
+                </li>
+              ))
+            ) : (
+              <li className="px-4 py-2 text-gray-500 italic">Aucun utilisateur trouvé</li>
+            )}
+          </ul>
+        )}
+      </div>
+    </div>
+  }
+  <div className='w-1/5 bg-green-200 h-full'>
+    {/* Liste d'amis */}
+    <div className="bg-white p-4 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Your friends</h2>
+      <ul className="list-disc list-inside w-full">
+          {currentFriendsPseudos?.slice(0, 5).map((friend) => (
+            <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
+              <div>{friend}</div>
+              <button className='p-2 bg-red-300 hover:bg-blue-200 rounded-md cursor-pointer'>Delete friend</button>
+              </li>
+        ))}
+      </ul>
+    </div>
+</div>
 
   <div className='h-full w-1/5 p-2 flex flex-col'>
-    <h2 className='mt-4 flex justify-start font-semibold text-xl'>Live chat</h2>
+  <div className='p-2 mt-4 flex justify-between'>
+    <h2 className='font-semibold text-xl'>Live chat</h2>
+    <div className='cursor-pointer' onClick={() => setShowFriends(true)}>
+      <svg viewBox="0 0 64 64" width={30} height={30} xmlns="http://www.w3.org/2000/svg" strokeWidth="3" stroke="#000000" fill="none"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="29.22" cy="16.28" r="11.14"></circle><path d="M41.32,35.69c-2.69-1.95-8.34-3.25-12.1-3.25h0A22.55,22.55,0,0,0,6.67,55h29.9"></path><circle cx="45.38" cy="46.92" r="11.94"></circle><line x1="45.98" y1="39.8" x2="45.98" y2="53.8"></line><line x1="38.98" y1="46.8" x2="52.98" y2="46.8"></line></g></svg>
+    </div>
+  </div>
     <div className='bg-[#f3f3f3] p-2 rounded-md w-auto my-4 flex relative'>
       <div className='absolute right-5 top-1/2 -translate-y-1/2'>
         <svg viewBox="0 0 24 24" width={20} height={20} fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c7c7c7"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke="#c7c7c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path> </g></svg>
