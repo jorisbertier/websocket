@@ -380,38 +380,78 @@ export default function MessagesPage() {
     <div className="bg-white p-4 rounded shadow">
       <div className='flex justify-between'>
         <h2 className="text-xl font-semibold mb-4">Your friends</h2>
-        <span>{currentFriendsPseudos?.length}</span>
+        <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
+          {currentFriendsPseudos?.length}
+        </span>
       </div>
       <ul className="list-disc list-inside w-full">
-          {currentFriendsPseudos?.slice(0, 5).map((friend) => (
-            <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
-              <div className='w-20 overflow-y-hidden'>{friend?.slice(0, 10)}</div>
-              <button
-                className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'
-                onClick={() => {
-                  const friendObj = usersList.find(u => u.pseudo === friend);
-                    const id = friendObj?._id || null;
-                    setMessages([]);
-                    setChatFriend(id);
-                    if (id) fetchMessages(id);
-                }}
-              >
-                Send a message
-              </button>
-              <button className='p-2 bg-red-300 hover:bg-blue-200 rounded-md cursor-pointer'>Delete friend</button>
-              
-              </li>
+        {currentFriendsPseudos?.slice(0, 5).map((friend) => (
+          <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
+            <div className='w-20 overflow-y-hidden'>{friend?.slice(0, 10)}</div>
+            <button
+              className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer transition-colors durantion-300 ease-in-out'
+              onClick={() => {
+                const friendObj = usersList.find(u => u.pseudo === friend);
+                  const id = friendObj?._id || null;
+                  setMessages([]);
+                  setChatFriend(id);
+                  if (id) fetchMessages(id);
+              }}
+            >
+              Send a message
+            </button>
+            <button className='p-2 bg-red-400 hover:bg-red-200 rounded-md cursor-pointer transition-colors durantion-300 ease-in-out'>Delete friend</button>
+            
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* List request sent */}
+      <div className="bg-white p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
+        <ul className="list-disc list-inside">
+          {pendingFriendRequests?.map((request) => (
+          <li key={request} className='flex justify-between w-72'>
+            <div>{request}</div>
+            <button onClick={() => handleCancelFriendRequest(request)} className='p-2 rounded-md bg-red-400 cursor-pointer hover:bg-red-200'>Cancel request</button>
+          </li>
         ))}
       </ul>
+    {pendingFriendRequests.length === 0 && <div className='w-full text-center'>You haven't sent any friend requests.</div>}
     </div>
-</div>
+    {/*Demande recue d'amis*/}
+    <div className="bg-white p-4 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Friend request received</h2>
+      <ul className="list-disc list-inside">
+      {friendRequests?.map((requestId: string) => {
+
+        const sender = usersList.find((u) => u._id === requestId);
+        if(!sender) return null;
+
+        return (
+          <li key={requestId} className='flex justify-between items-center mb-2'>
+            <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
+          <div className="space-x-2">
+            <button onClick={() => handleRespond(sender?._id, 'accept')} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
+            <button onClick={() => handleRespond(sender?._id, 'reject')} className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
+          </div>
+          </li>
+        );
+        })}
+        {friendRequests.length === 0 && <div className='w-full text-center'>You have not received any friend requests.</div>}
+      </ul>
+    </div>
+    <Modal message="Request accepted" show={showModal} onClose={() => setShowModal(false)}/>
+    <Modal message="Request rejected" show={showModalReject} onClose={() => setShowModalReject(false)}/>
+    <Modal message="Request sent" show={showModalRequestSent} onClose={() => setShowModalRequestSent(false)}/>
+  </div>
 
   <div className='h-full w-1/5 p-2 flex flex-col'>
   <div className='p-2 mt-4 flex justify-between'>
     <h2 className='font-semibold text-xl'>Live chat</h2>
-    <div className='cursor-pointer' onClick={() => setShowFriends(true)}>
-      <svg viewBox="0 0 64 64" width={30} height={30} xmlns="http://www.w3.org/2000/svg" strokeWidth="3" stroke="#000000" fill="none"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="29.22" cy="16.28" r="11.14"></circle><path d="M41.32,35.69c-2.69-1.95-8.34-3.25-12.1-3.25h0A22.55,22.55,0,0,0,6.67,55h29.9"></path><circle cx="45.38" cy="46.92" r="11.94"></circle><line x1="45.98" y1="39.8" x2="45.98" y2="53.8"></line><line x1="38.98" y1="46.8" x2="52.98" y2="46.8"></line></g></svg>
-    </div>
+    <div className='cursor-pointer' onClick={() => setShowFriends(true)} title="Add new friend">
+      
+    </div><svg viewBox="0 0 64 64" width={30} height={30} xmlns="http://www.w3.org/2000/svg" strokeWidth="3" stroke="#000000" fill="none"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="29.22" cy="16.28" r="11.14"></circle><path d="M41.32,35.69c-2.69-1.95-8.34-3.25-12.1-3.25h0A22.55,22.55,0,0,0,6.67,55h29.9"></path><circle cx="45.38" cy="46.92" r="11.94"></circle><line x1="45.98" y1="39.8" x2="45.98" y2="53.8"></line><line x1="38.98" y1="46.8" x2="52.98" y2="46.8"></line></g></svg>
   </div>
     <div className='bg-[#f3f3f3] p-2 rounded-md w-auto my-4 flex relative'>
       <div className='absolute right-5 top-1/2 -translate-y-1/2'>
@@ -424,7 +464,7 @@ export default function MessagesPage() {
           {conversations.map((convUser) => (
                 <article
                   key={convUser._id}
-                  className=' bg-white w-full flex h-16 rounded-sm hover:bg-gray-200 duration-200 ease-in-out cursor-pointer'
+                  className={`w-full flex h-16 rounded-sm hover:bg-gray-200 duration-200 ease-in-out cursor-pointer ${chatFriend === convUser._id ? 'bg-gray-200' : 'bg-white'}`}
                   onClick={() => {
                     setChatFriend(convUser._id);
                     fetchMessages(convUser._id);
@@ -476,7 +516,7 @@ export default function MessagesPage() {
               {messages.map((msg, idx) => (
                 <div key={idx} className={`mb-2 ${msg.from === user?._id ? 'text-right' : 'text-left'}`}>
                   {/* <span className="inline-block bg-gray-200 px-3 py-1 rounded">{msg.text}</span> */}
-                  <span className={`inline-block px-3 p-2 rounded-md ${msg.from === user?._id ? 'bg-blue-300' : 'bg-gray-200'}`}>{msg.text}</span>
+                  <span className={`inline-block px-3 p-2 rounded-md ${msg.from === user?._id ? 'bg-[#90cdf4]' : 'bg-gray-200'}`}>{msg.text}</span>
                 </div>
               ))}
               <div ref={bottomRef}></div>
