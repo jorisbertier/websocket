@@ -408,7 +408,12 @@ export default function MessagesPage() {
       </div>
       {/* List request sent */}
       <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
+        <div className='flex justify-between'>
+          <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
+          <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
+            {pendingFriendRequests?.length}
+          </span>
+        </div>
         <ul className="list-disc list-inside">
           {pendingFriendRequests?.map((request) => (
           <li key={request} className='flex justify-between w-72'>
@@ -421,7 +426,12 @@ export default function MessagesPage() {
     </div>
     {/*Demande recue d'amis*/}
     <div className="bg-white p-4 rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">Friend request received</h2>
+      <div className='flex justify-between'>
+        <h2 className="text-xl font-semibold mb-4">Friend request received </h2>
+        <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
+          {friendRequests?.length}
+        </span>
+      </div>
       <ul className="list-disc list-inside">
       {friendRequests?.map((requestId: string) => {
 
