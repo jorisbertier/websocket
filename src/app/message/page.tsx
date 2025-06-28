@@ -378,12 +378,28 @@ export default function MessagesPage() {
   <div className='w-1/5 bg-green-200 h-full'>
     {/* Liste d'amis */}
     <div className="bg-white p-4 rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">Your friends</h2>
+      <div className='flex justify-between'>
+        <h2 className="text-xl font-semibold mb-4">Your friends</h2>
+        <span>{currentFriendsPseudos?.length}</span>
+      </div>
       <ul className="list-disc list-inside w-full">
           {currentFriendsPseudos?.slice(0, 5).map((friend) => (
             <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
-              <div>{friend}</div>
+              <div className='w-20 overflow-y-hidden'>{friend?.slice(0, 10)}</div>
+              <button
+                className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer'
+                onClick={() => {
+                  const friendObj = usersList.find(u => u.pseudo === friend);
+                    const id = friendObj?._id || null;
+                    setMessages([]);
+                    setChatFriend(id);
+                    if (id) fetchMessages(id);
+                }}
+              >
+                Send a message
+              </button>
               <button className='p-2 bg-red-300 hover:bg-blue-200 rounded-md cursor-pointer'>Delete friend</button>
+              
               </li>
         ))}
       </ul>
