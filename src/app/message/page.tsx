@@ -525,7 +525,6 @@ export default function MessagesPage() {
             <div className="flex-[5] mt-0 overflow-y-auto p-2">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`mb-2 ${msg.from === user?._id ? 'text-right' : 'text-left'}`}>
-                  {/* <span className="inline-block bg-gray-200 px-3 py-1 rounded">{msg.text}</span> */}
                   <span className={`inline-block px-3 p-2 rounded-md ${msg.from === user?._id ? 'bg-[#90cdf4]' : 'bg-gray-200'}`}>{msg.text}</span>
                 </div>
               ))}
