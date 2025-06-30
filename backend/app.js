@@ -50,15 +50,13 @@ app.use('/api/messages', messageRoutes);
 io.on('connection', (socket) => {
     console.log('Un utilisateur s\'est connecté')
 
-    // socket.on('message', (msg) => {
-    //     console.log('Message reçu :', msg);
-    //     io.emit('message', msg);
-    // });
-       // Réception de l'identité de l'utilisateur
+    // Réception de l'identité de l'utilisateur
     socket.on('identify', (userId) => {
         users.set(socket.id, userId);
         userSockets.set(userId, socket.id);
         console.log(`Utilisateur ${userId} connecté via le socket ${socket.id}`);
+        //get user is online
+        io.emit('user_connected', userId);
     });
 
     socket.on('private_message', async ({ toUserId, fromUserId, message }) => {
@@ -83,6 +81,8 @@ io.on('connection', (socket) => {
         if (userId) {
             users.delete(socket.id);
             userSockets.delete(userId);
+            // get user disconnected
+            io.emit('user_disconnected', userId);
         }
         console.log('Un utilisateur s\'est déconnecté');
     });

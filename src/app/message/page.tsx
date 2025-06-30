@@ -52,6 +52,7 @@ export default function MessagesPage() {
   const [chatMessage, setChatMessage] = useState('');
   const [messages, setMessages] = useState<{from: string, text: string}[]>([]);
   const socketRef = useSocket(user?._id);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -67,9 +68,25 @@ export default function MessagesPage() {
     };
 
     socketRef.current.on('private_message', handleIncomingMessage);
+    
+    // Gestion des utilisateurs connectés/déconnectés
+    socketRef.current.emit('identify', user?._id);
+
+    const handleUserConnected = (userId: string) => {
+      setOnlineUsers(prev => [...new Set([...prev, userId])]);
+    };
+
+    const handleUserDisconnected = (userId: string) => {
+      setOnlineUsers(prev => prev.filter(id => id !== userId));
+    };
+
+    socketRef.current.on('user_connected', handleUserConnected);
+    socketRef.current.on('user_disconnected', handleUserDisconnected);
 
     return () => {
       socketRef.current?.off('private_message', handleIncomingMessage);
+      socketRef.current?.off('user_connected', handleUserConnected);
+      socketRef.current?.off('user_disconnected', handleUserDisconnected);
     };
   }, [socketRef, chatFriend]);
 
@@ -511,7 +528,7 @@ export default function MessagesPage() {
                   </div>
                   <div className=''>
                     <h3>Jane Cooper</h3>
-                    <span>Online</span>
+                    <span className={`${onlineUsers.includes(chatFriend) ? "text-green-300" : "text-red-400"}`}> {onlineUsers.includes(chatFriend) ? "En ligne" : "Hors ligne"}</span>
                 </div>
               </div>
               <div className='flex items-center justify-center cursor-pointer'>

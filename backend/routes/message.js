@@ -19,8 +19,6 @@ router.get('/conversations/:userId', async (req, res) => {
             if (msg.fromUserId !== userId) interlocutorsSet.add(msg.fromUserId.toString());
             if (msg.toUserId !== userId) interlocutorsSet.add(msg.toUserId.toString());
         });
-        console.log('message:', messages)
-        
         
         const interlocutors = Array.from(interlocutorsSet);
         console.log('interloutors:', interlocutors)
