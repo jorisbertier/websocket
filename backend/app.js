@@ -47,16 +47,33 @@ await connectToDatabase();
 app.use('/api', userRoutes);
 app.use('/api/messages', messageRoutes);
 
+app.get('/api/online-users', (req, res) => {
+    try {
+        const onlineUserIds = Array.from(userSockets.keys()); // userId[]
+        res.status(200).json(onlineUserIds);
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur serveur', error: err });
+    }
+});
+
 io.on('connection', (socket) => {
     console.log('Un utilisateur s\'est connecté')
 
     // Réception de l'identité de l'utilisateur
     socket.on('identify', (userId) => {
         users.set(socket.id, userId);
-        userSockets.set(userId, socket.id);
+        if (!userSockets.has(userId)) {
+            userSockets.set(userId, new Set());
+        }
+        userSockets.get(userId).add(socket.id);
         console.log(`Utilisateur ${userId} connecté via le socket ${socket.id}`);
         //get user is online
         io.emit('user_connected', userId);
+        for (const onlineUserId of userSockets.keys()) {
+        if (onlineUserId !== userId) {
+            socket.emit('user_connected', onlineUserId);
+        }
+        }
     });
 
     socket.on('private_message', async ({ toUserId, fromUserId, message }) => {
@@ -68,7 +85,9 @@ io.on('connection', (socket) => {
             // 2. Envoi au destinataire (s’il est connecté)
             const toSocketId = userSockets.get(toUserId);
         if (toSocketId) {
-            io.to(toSocketId).emit('private_message', { fromUserId, message });
+            for (const socketId of toSocketSet) {
+                io.to(socketId).emit('private_message', { fromUserId, toUserId, message });
+            }
         }
             console.log(`Message de ${fromUserId} vers ${toUserId} envoyé et sauvegardé.`);
         } catch (err) {
@@ -80,9 +99,16 @@ io.on('connection', (socket) => {
         const userId = users.get(socket.id);
         if (userId) {
             users.delete(socket.id);
-            userSockets.delete(userId);
-            // get user disconnected
-            io.emit('user_disconnected', userId);
+            const sockets = userSockets.get(userId);
+            if (sockets) {
+                sockets.delete(socket.id);
+
+                // Si plus aucun socket actif pour cet user
+                if (sockets.size === 0) {
+                    userSockets.delete(userId);
+                    io.emit('user_disconnected', userId);
+                }
+            }
         }
         console.log('Un utilisateur s\'est déconnecté');
     });
