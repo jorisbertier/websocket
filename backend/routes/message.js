@@ -42,7 +42,8 @@ router.get('/:userId/:friendId', async (req, res) => {
 
         const formatted = messages.map(msg => ({
             from: msg.fromUserId,
-            text: msg.message
+            text: msg.message,
+            timeStamp: msg.timeStamp
         }));
 
 

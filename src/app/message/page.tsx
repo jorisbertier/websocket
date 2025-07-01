@@ -51,7 +51,7 @@ export default function MessagesPage() {
   /* CHAT Socket */
   const [chatFriend, setChatFriend] = useState<string | null>(null);
   const [chatMessage, setChatMessage] = useState('');
-  const [messages, setMessages] = useState<{from: string, text: string}[]>([]);
+  const [messages, setMessages] = useState<{from: string, text: string, timeStamp: string}[]>([]);
   const socketRef = useSocket(user?._id);
   /* CHAT Onile users */
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
@@ -360,6 +360,10 @@ useEffect(() => {
     <div>
       {conversations.map((convUser) => {
         const isOnline = onlineUsers.includes(convUser._id);
+        const convMessages = messages.filter(m => m.from === convUser._id);
+        const sortedMessages = [...convMessages].sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
+        const lastMessage = sortedMessages;
+        console.log('test', messages)
 
         return (
           <article
@@ -380,7 +384,7 @@ useEffect(() => {
                 <h3 className='font-semibold text-sm'>{convUser.pseudo}</h3>
                 <time className='text-gray-600 text-sm'>13:11</time>
               </header>
-              <p className='ml-2 text-sm text-gray-500'>typing ...</p>
+              <p className='ml-2 text-sm text-gray-500'>{lastMessage?.message}</p>
               <span className={`${isOnline ? "text-green-300" : "text-red-400"}`}>
                 {isOnline ? "En ligne" : "Hors ligne"}
               </span>
