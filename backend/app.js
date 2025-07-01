@@ -43,7 +43,6 @@ app.use(express.json());
 
 await connectToDatabase();
 
-
 app.use('/api', userRoutes);
 app.use('/api/messages', messageRoutes);
 
@@ -51,6 +50,7 @@ app.get('/api/online-users', (req, res) => {
     try {
         const onlineUserIds = Array.from(userSockets.keys()); // userId[]
         res.status(200).json(onlineUserIds);
+        console.log('Utilisateurs connectés:', Array.from(userSockets.keys()));
     } catch (err) {
         res.status(500).json({ message: 'Erreur serveur', error: err });
     }
@@ -69,11 +69,12 @@ io.on('connection', (socket) => {
         console.log(`Utilisateur ${userId} connecté via le socket ${socket.id}`);
         //get user is online
         io.emit('user_connected', userId);
-        for (const onlineUserId of userSockets.keys()) {
-        if (onlineUserId !== userId) {
-            socket.emit('user_connected', onlineUserId);
-        }
-        }
+        socket.emit('online_users_list', Array.from(userSockets.keys()));
+        // for (const onlineUserId of userSockets.keys()) {
+        // if (onlineUserId !== userId) {
+        //     socket.emit('user_connected', onlineUserId);
+        // }
+        // }
     });
 
     socket.on('private_message', async ({ toUserId, fromUserId, message }) => {
@@ -83,8 +84,8 @@ io.on('connection', (socket) => {
             await newMessage.save();
 
             // 2. Envoi au destinataire (s’il est connecté)
-            const toSocketId = userSockets.get(toUserId);
-        if (toSocketId) {
+            const toSocketSet = userSockets.get(toUserId);
+        if (toSocketSet) {
             for (const socketId of toSocketSet) {
                 io.to(socketId).emit('private_message', { fromUserId, toUserId, message });
             }
