@@ -406,7 +406,7 @@ useEffect(() => {
                 <h3 className='font-semibold text-sm'>{convUser.pseudo}</h3>
                 <time className='text-gray-600 text-sm'>13:11</time>
               </header>
-              <p className='ml-2 text-sm text-gray-500'>{lastMessage?.text.length > 15 ? lastMessage?.text.slice(0, 15) + "..." : lastMessage?.text }</p>
+              <p className='ml-2 text-sm text-gray-500'>{lastMessage?.from === user?._id ? 'Message envoyé' : lastMessage?.text.length > 15 ? lastMessage?.text.slice(0, 15) + "..." : lastMessage?.text }</p>
               <span className={`${isOnline ? "text-green-300" : "text-red-400"}`}>
                 {isOnline ? "En ligne" : "Hors ligne"}
               </span>
