@@ -12,6 +12,7 @@ import { useFetchOnlineUsers } from '@/hooks/useFetchOnlineUsers';
 import { fetchallLastMessages } from '@/utils/fetchAllLastMessages';
 import { User } from "@/interface/interface";
 import ListFriends from '@/component/ListFriends';
+import ListRequestSent from '@/component/ListRequestSent';
 
 
 export default function MessagesPage() {
@@ -266,7 +267,7 @@ export default function MessagesPage() {
       {/* Liste d'amis */}
         <ListFriends currentFriendsPseudos={currentFriendsPseudos} usersList={usersList} setMessages={setMessages} setChatFriend={setChatFriend} fetchMessages={fetchMessages}/>
         {/* List request sent */}
-        <div className="bg-white p-4 rounded shadow">
+        {/* <div className="bg-white p-4 rounded shadow">
           <div className='flex justify-between'>
             <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
             <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
@@ -275,14 +276,15 @@ export default function MessagesPage() {
           </div>
           <ul className="list-disc list-inside">
             {pendingFriendRequests?.map((request) => (
-            <li key={request} className='flex justify-between w-72'>
-              <div>{request}</div>
-              <button onClick={() => handleCancelFriendRequest(request)} className='p-2 rounded-md bg-red-400 cursor-pointer hover:bg-red-200'>Cancel request</button>
-            </li>
-          ))}
-        </ul>
-      {pendingFriendRequests.length === 0 && <div className='w-full text-center'>You haven't sent any friend requests.</div>}
-      </div>
+              <li key={request} className='flex justify-between w-72'>
+                <div>{request}</div>
+                <button onClick={() => handleCancelFriendRequest(request)} className='p-2 rounded-md bg-red-400 cursor-pointer hover:bg-red-200'>Cancel request</button>
+              </li>
+            ))}
+          </ul>
+        {pendingFriendRequests.length === 0 && <div className='w-full text-center'>You haven't sent any friend requests.</div>}
+        </div> */}
+        <ListRequestSent pendingFriendRequests={pendingFriendRequests} handleCancelFriendRequest={handleCancelFriendRequest} />
       {/*Demande recue d'amis*/}
       <div className="bg-white p-4 rounded shadow">
         <div className='flex justify-between'>
