@@ -9,21 +9,10 @@ import useSocket from '@/hooks/useSocket';
 import { useRef } from 'react';
 import Image from 'next/image';
 import { useFetchOnlineUsers } from '@/hooks/useFetchOnlineUsers';
+import { fetchallLastMessages } from '@/utils/fetchAllLastMessages';
+import { User } from "@/interface/interface";
+import ListFriends from '@/component/ListFriends';
 
-
-interface User {
-  _id: string;
-  pseudo: string;
-  friends?: [];
-  friendRequests?: [],
-  friendRequestsSent?: [],
-}
-
-// interface Message {
-//   id: number;
-//   from: string;
-//   text: string;
-// }
 
 export default function MessagesPage() {
 
@@ -47,6 +36,8 @@ export default function MessagesPage() {
   const [showModalRequestSent, setShowModalRequestSent] = useState(false);
 
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
+  
+  const [lastMessagesMap, setLastMessagesMap] = useState<{ [key: string]: any }>({});
 
   /* CHAT Socket */
   const [chatFriend, setChatFriend] = useState<string | null>(null);
@@ -55,10 +46,28 @@ export default function MessagesPage() {
   const socketRef = useSocket(user?._id);
   /* CHAT Onile users */
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-  useFetchOnlineUsers(user, setOnlineUsers);
-
+  
   const bottomRef = useRef<HTMLDivElement | null>(null);
   
+  const [conversations, setConversations] = useState<User[]>([]);
+  const isOnline = chatFriend ? onlineUsers.includes(chatFriend) : false;
+
+  useFetchOnlineUsers(user, setOnlineUsers);
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      if (!user?._id) return;
+
+      const res = await fetch(`http://localhost:3001/api/messages/conversations/${user._id}`);
+      const interlocutorIds: string[] = await res.json();
+
+      const convUsers = usersList.filter((u) => interlocutorIds.includes(u._id));
+      console.log('con user', interlocutorIds)
+      setConversations(convUsers);
+    };
+
+    fetchConversations();
+  }, [user, usersList]);
 
   useEffect(() => {
     if (!socketRef.current) return;
@@ -77,40 +86,50 @@ export default function MessagesPage() {
     };
   }, [socketRef, chatFriend]);
 
-useEffect(() => {
-  if (!socketRef.current || !user?._id) return;
+  useEffect(() => {
+    if (!socketRef.current || !user?._id) return;
 
-  // Envoi l'identification au serveur socket
-  socketRef.current.emit('identify', user._id);
+    // Envoi l'identification au serveur socket
+    socketRef.current.emit('identify', user._id);
 
-  // Ajoute en live un user connecté
-  const handleUserConnected = (userId: string) => {
-    setOnlineUsers(prev => [...new Set([...prev, userId])]);
-  };
+    // Ajoute en live un user connecté
+    const handleUserConnected = (userId: string) => {
+      setOnlineUsers(prev => [...new Set([...prev, userId])]);
+    };
 
-  // Supprime en live un user déconnecté
-  const handleUserDisconnected = (userId: string) => {
-    setOnlineUsers(prev => prev.filter(id => id !== userId));
-  };
-  
-  const handleOnlineUsersList = (users: string[]) => {
-    setOnlineUsers(users);
-  };
+    // Supprime en live un user déconnecté
+    const handleUserDisconnected = (userId: string) => {
+      setOnlineUsers(prev => prev.filter(id => id !== userId));
+    };
+    
+    const handleOnlineUsersList = (users: string[]) => {
+      setOnlineUsers(users);
+    };
 
-  // Ecoute les events socket
-  socketRef.current.on('user_connected', handleUserConnected);
-  socketRef.current.on('user_disconnected', handleUserDisconnected);
-  socketRef.current.on('online_users_list', handleOnlineUsersList);
+    // Ecoute les events socket
+    socketRef.current.on('user_connected', handleUserConnected);
+    socketRef.current.on('user_disconnected', handleUserDisconnected);
+    socketRef.current.on('online_users_list', handleOnlineUsersList);
 
+    return () => {
+      socketRef.current?.off('user_connected', handleUserConnected);
+      socketRef.current?.off('user_disconnected', handleUserDisconnected);
+      socketRef.current?.off('online_users_list', handleOnlineUsersList);
 
+    };
+  }, [socketRef, user]);
 
-  return () => {
-    socketRef.current?.off('user_connected', handleUserConnected);
-    socketRef.current?.off('user_disconnected', handleUserDisconnected);
-    socketRef.current?.off('online_users_list', handleOnlineUsersList);
+  useEffect(() => {
+    const getLastMessages = async () => {
+      const map = await fetchallLastMessages(user?._id, conversations);
+      setLastMessagesMap(map);
+    };
 
-  };
-}, [socketRef, user]);
+    if (conversations.length) {
+      getLastMessages();
+    }
+  }, [conversations]);
+
 
   const handleSendMessage = () => {
     if (socketRef.current && chatFriend && user?._id) {
@@ -136,9 +155,9 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
-  // bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-}, [messages]);
+  // useEffect(() => {
+  //   bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+  // }, [messages]);
 
   useEffect(() => {
     if (user?.friendRequests) {
@@ -202,50 +221,7 @@ useEffect(() => {
     }
   }
 
-  const [conversations, setConversations] = useState<User[]>([]);
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      if (!user?._id) return;
-
-      const res = await fetch(`http://localhost:3001/api/messages/conversations/${user._id}`);
-      const interlocutorIds: string[] = await res.json();
-
-      const convUsers = usersList.filter((u) => interlocutorIds.includes(u._id));
-      console.log('con user', interlocutorIds)
-      setConversations(convUsers);
-    };
-
-    fetchConversations();
-  }, [user, usersList]);
-
-  const isOnline = chatFriend ? onlineUsers.includes(chatFriend) : false;
-  const [lastMessagesMap, setLastMessagesMap] = useState<{ [key: string]: any }>({});
-
-useEffect(() => {
-  const fetchAllLastMessages = async () => {
-    const newMap: { [key: string]: any } = {};
-
-    for (const convUser of conversations) {
-      try {
-        const res = await fetch(`http://localhost:3001/api/messages/${user?._id}/${convUser._id}`);
-        const data = await res.json();
-        const sorted = [...data].sort((a, b) => new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime());
-        if (sorted.length > 0) {
-          newMap[convUser._id] = sorted[0]; // dernier message
-        }
-      } catch (error) {
-        console.error(`Erreur messages pour ${convUser._id}`, error);
-      }
-    }
-
-    setLastMessagesMap(newMap);
-  };
-
-  if (conversations.length) {
-    fetchAllLastMessages();
-  }
-}, [conversations]);
   return (
   <div className='h-screen flex relative'>
     {showFriends &&
@@ -288,35 +264,7 @@ useEffect(() => {
     }
     <div className='w-1/5 bg-green-200 h-full'>
       {/* Liste d'amis */}
-      <div className="bg-white p-4 rounded shadow">
-        <div className='flex justify-between'>
-          <h2 className="text-xl font-semibold mb-4">Your friends</h2>
-          <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
-            {currentFriendsPseudos?.length}
-          </span>
-        </div>
-        <ul className="list-disc list-inside w-full">
-          {currentFriendsPseudos?.slice(0, 5).map((friend) => (
-            <li className='text-black flex justify-around w-72 items-center gap-4 mb-2' key={friend}>
-              <div className='w-20 overflow-y-hidden'>{friend?.slice(0, 10)}</div>
-              <button
-                className='p-2 bg-blue-300 hover:bg-blue-200 rounded-md cursor-pointer transition-colors durantion-300 ease-in-out'
-                onClick={() => {
-                  const friendObj = usersList.find(u => u.pseudo === friend);
-                    const id = friendObj?._id || null;
-                    setMessages([]);
-                    setChatFriend(id);
-                    if (id) fetchMessages(id);
-                }}
-              >
-                Send a message
-              </button>
-              <button className='p-2 bg-red-400 hover:bg-red-200 rounded-md cursor-pointer transition-colors durantion-300 ease-in-out'>Delete friend</button>
-              
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ListFriends currentFriendsPseudos={currentFriendsPseudos} usersList={usersList} setMessages={setMessages} setChatFriend={setChatFriend} fetchMessages={fetchMessages}/>
         {/* List request sent */}
         <div className="bg-white p-4 rounded shadow">
           <div className='flex justify-between'>
