@@ -381,7 +381,7 @@ useEffect(() => {
         <input name="search" placeholder='search ...' className='w-full outline-none border-none p-1 rounded-md'/>
       </div>
       {conversations.length > 0 ? (
-    <div>
+    <div className='gap-2'>
       {conversations.map((convUser) => {
         const isOnline = onlineUsers.includes(convUser._id);
         const lastMessage = lastMessagesMap[convUser._id];
@@ -390,7 +390,7 @@ useEffect(() => {
         return (
           <article
             key={convUser._id}
-            className={`w-full flex h-16 rounded-sm hover:bg-gray-200 duration-200 ease-in-out cursor-pointer ${chatFriend === convUser._id ? 'bg-gray-200' : 'bg-white'}`}
+            className={`w-full flex mb-2 p-1 h-20 rounded-sm hover:bg-gray-200 duration-200 ease-in-out cursor-pointer ${chatFriend === convUser._id ? 'bg-gray-200' : 'bg-white'}`}
             onClick={() => {
               setChatFriend(convUser._id);
               fetchMessages(convUser._id);
@@ -407,7 +407,7 @@ useEffect(() => {
                 <time className='text-gray-600 text-sm'>13:11</time>
               </header>
               <p className='ml-2 text-sm text-gray-500'>{lastMessage?.from === user?._id ? 'Message envoyé' : lastMessage?.text.length > 15 ? lastMessage?.text.slice(0, 15) + "..." : lastMessage?.text }</p>
-              <span className={`${isOnline ? "text-green-300" : "text-red-400"}`}>
+              <span className={`ml-2 ${isOnline ? "text-green-300" : "text-red-400"}`}>
                 {isOnline ? "En ligne" : "Hors ligne"}
               </span>
             </section>
