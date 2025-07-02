@@ -13,6 +13,7 @@ import { fetchallLastMessages } from '@/utils/fetchAllLastMessages';
 import { User } from "@/interface/interface";
 import ListFriends from '@/component/ListFriends';
 import ListRequestSent from '@/component/ListRequestSent';
+import ListRequestReceive from '@/component/ListRequestReceive';
 
 
 export default function MessagesPage() {
@@ -265,53 +266,12 @@ export default function MessagesPage() {
     }
     <div className='w-1/5 bg-green-200 h-full'>
       {/* Liste d'amis */}
-        <ListFriends currentFriendsPseudos={currentFriendsPseudos} usersList={usersList} setMessages={setMessages} setChatFriend={setChatFriend} fetchMessages={fetchMessages}/>
-        {/* List request sent */}
-        {/* <div className="bg-white p-4 rounded shadow">
-          <div className='flex justify-between'>
-            <h2 className="text-xl font-semibold mb-4">Friend request sent </h2>
-            <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
-              {pendingFriendRequests?.length}
-            </span>
-          </div>
-          <ul className="list-disc list-inside">
-            {pendingFriendRequests?.map((request) => (
-              <li key={request} className='flex justify-between w-72'>
-                <div>{request}</div>
-                <button onClick={() => handleCancelFriendRequest(request)} className='p-2 rounded-md bg-red-400 cursor-pointer hover:bg-red-200'>Cancel request</button>
-              </li>
-            ))}
-          </ul>
-        {pendingFriendRequests.length === 0 && <div className='w-full text-center'>You haven't sent any friend requests.</div>}
-        </div> */}
-        <ListRequestSent pendingFriendRequests={pendingFriendRequests} handleCancelFriendRequest={handleCancelFriendRequest} />
-      {/*Demande recue d'amis*/}
-      <div className="bg-white p-4 rounded shadow">
-        <div className='flex justify-between'>
-          <h2 className="text-xl font-semibold mb-4">Friend request received </h2>
-          <span className="bg-blue-300 text-white text-sm font-bold w-7 h-7 flex justify-center items-center rounded-full">
-            {friendRequests?.length}
-          </span>
-        </div>
-        <ul className="list-disc list-inside">
-        {friendRequests?.map((requestId: string) => {
+      <ListFriends currentFriendsPseudos={currentFriendsPseudos} usersList={usersList} setMessages={setMessages} setChatFriend={setChatFriend} fetchMessages={fetchMessages}/>
+      {/* List request sent */}
+      <ListRequestSent pendingFriendRequests={pendingFriendRequests} handleCancelFriendRequest={handleCancelFriendRequest} />
+      {/*Receive request friends*/}
+      <ListRequestReceive friendRequests={friendRequests} usersList={usersList} handleRespond={handleRespond}/>
 
-          const sender = usersList.find((u) => u._id === requestId);
-          if(!sender) return null;
-
-          return (
-            <li key={requestId} className='flex justify-between items-center mb-2'>
-              <span>{sender?.pseudo ?? 'Utilisateur inconnu'}</span>
-            <div className="space-x-2">
-              <button onClick={() => handleRespond(sender?._id, 'accept')} className="bg-green-400 hover:underline cursor-pointer p-2 rounded-md">Accepter</button>
-              <button onClick={() => handleRespond(sender?._id, 'reject')} className="bg-red-400 hover:underline cursor-pointer p-2 rounded-md">Refuser</button>
-            </div>
-            </li>
-          );
-          })}
-          {friendRequests.length === 0 && <div className='w-full text-center'>You have not received any friend requests.</div>}
-        </ul>
-      </div>
       <Modal message="Request accepted" show={showModal} onClose={() => setShowModal(false)}/>
       <Modal message="Request rejected" show={showModalReject} onClose={() => setShowModalReject(false)}/>
       <Modal message="Request sent" show={showModalRequestSent} onClose={() => setShowModalRequestSent(false)}/>
