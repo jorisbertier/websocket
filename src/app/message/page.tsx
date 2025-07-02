@@ -220,8 +220,32 @@ useEffect(() => {
   }, [user, usersList]);
 
   const isOnline = chatFriend ? onlineUsers.includes(chatFriend) : false;
-  console.log('isonline:,', isOnline)
+  const [lastMessagesMap, setLastMessagesMap] = useState<{ [key: string]: any }>({});
 
+useEffect(() => {
+  const fetchAllLastMessages = async () => {
+    const newMap: { [key: string]: any } = {};
+
+    for (const convUser of conversations) {
+      try {
+        const res = await fetch(`http://localhost:3001/api/messages/${user?._id}/${convUser._id}`);
+        const data = await res.json();
+        const sorted = [...data].sort((a, b) => new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime());
+        if (sorted.length > 0) {
+          newMap[convUser._id] = sorted[0]; // dernier message
+        }
+      } catch (error) {
+        console.error(`Erreur messages pour ${convUser._id}`, error);
+      }
+    }
+
+    setLastMessagesMap(newMap);
+  };
+
+  if (conversations.length) {
+    fetchAllLastMessages();
+  }
+}, [conversations]);
   return (
   <div className='h-screen flex relative'>
     {showFriends &&
@@ -360,10 +384,8 @@ useEffect(() => {
     <div>
       {conversations.map((convUser) => {
         const isOnline = onlineUsers.includes(convUser._id);
-        const convMessages = messages.filter(m => m.from === convUser._id);
-        const sortedMessages = [...convMessages].sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
-        const lastMessage = sortedMessages;
-        console.log('test', messages)
+        const lastMessage = lastMessagesMap[convUser._id];
+        console.log('last message', lastMessage)
 
         return (
           <article
@@ -384,7 +406,7 @@ useEffect(() => {
                 <h3 className='font-semibold text-sm'>{convUser.pseudo}</h3>
                 <time className='text-gray-600 text-sm'>13:11</time>
               </header>
-              <p className='ml-2 text-sm text-gray-500'>{lastMessage?.message}</p>
+              <p className='ml-2 text-sm text-gray-500'>{lastMessage?.text.length > 15 ? lastMessage?.text.slice(0, 15) + "..." : lastMessage?.text }</p>
               <span className={`${isOnline ? "text-green-300" : "text-red-400"}`}>
                 {isOnline ? "En ligne" : "Hors ligne"}
               </span>
