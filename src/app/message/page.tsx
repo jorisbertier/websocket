@@ -239,7 +239,7 @@ export default function MessagesPage() {
             onChange={handleSearchFriend}
             className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-
+{/* style */}
           {newFriend && (
             <ul className="bg-gray-50 border border-gray-200 rounded-lg shadow-inner max-h-40 overflow-y-auto">
               {filteredUsersList.length > 0 ? (
