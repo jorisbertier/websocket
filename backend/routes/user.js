@@ -1,6 +1,6 @@
 import { User }  from '../models/user.js';
 import express from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import auth from '../middleware/auth.js';
