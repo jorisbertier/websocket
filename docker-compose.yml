@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  backend:
+    image: node:18
+    ports:
+      - 3001:3001
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URL:  mongodb+srv://jorisbertier:44rHlpLstlWUriDh@cluster0.aodzz4w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      JWT_SECRET: monSuperSecretAleatoireEtLong123!
+    command: node app.js
+
+  frontend:
+    image: node:18
+    command: npm run dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+    working_dir: /app/src
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo
+    restart: always
+    ports: 
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH: "false"
+
+volumes:
+  mongo-data:
