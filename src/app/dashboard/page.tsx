@@ -27,6 +27,7 @@ export default function Dashboard() {
                 </p>
             </div>
 
+            {/* Chat component */}
             <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-700 mb-4">Zone de Chat</h2>
             </div>
